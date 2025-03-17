@@ -1,0 +1,913 @@
+"","studycode","OUT","OUCRU_outcome","Combined_treatment_outcome","is_remove"
+"1","28TB-D01-001","Cured","Cured","Cured",NA
+"2","28TB-D01-002","LOSTFU","LOSTFU","LOSTFU",NA
+"3","28TB-D01-003","Cured","Cured","Cured",NA
+"4","28TB-D01-004","Cured","Cured","Cured",NA
+"5","28TB-D04-001","Cured","Cured","Cured",NA
+"6","28TB-D04-002","Cured","Cured","Cured",NA
+"7","28TB-D05-001","Failed","Failed","Failed",NA
+"8","28TB-D05-002","Cured","Cured","Cured",NA
+"9","28TB-D05-003","Cured","Cured","Cured",NA
+"10","28TB-D05-004","Cured","Cured","Cured",NA
+"11","28TB-D06-001","Cured","Cured","Cured",NA
+"12","28TB-D06-002","Treatment Completed","Cured","Cured",NA
+"13","28TB-D06-003","Treatment Completed","Failed","Failed",NA
+"14","28TB-D06-004","Cured","Cured","Cured",NA
+"15","28TB-D06-005","Treatment Completed","Cured","Cured",NA
+"16","28TB-D06-006","Died","Died","Died",NA
+"17","28TB-D06-007","Cured","Cured","Cured",NA
+"18","28TB-D06-008","Treatment Completed","Failed","Failed",NA
+"19","28TB-D06-009","LOSTFU","LOSTFU","LOSTFU",NA
+"20","28TB-D06-010","Cured","Cured","Cured",NA
+"21","28TB-D06-011","Cured","Cured","Cured",NA
+"22","28TB-D06-012","Cured","Cured","Cured",NA
+"23","28TB-D06-014","Cured","Cured","Cured",NA
+"24","28TB-D06-015","Cured","Cured","Cured",NA
+"25","28TB-D06-016","Cured","Cured","Cured",NA
+"26","28TB-D06-017","Cured","Cured","Cured",NA
+"27","28TB-D06-018","Failed","Cured","Cured",NA
+"28","28TB-D08-001","Cured","Cured","Cured",NA
+"29","28TB-D08-002","Cured","Treatment Completed","Treatment Completed",NA
+"30","28TB-D09-001","LOSTFU","LOSTFU","LOSTFU",NA
+"31","28TB-D09-002","Cured","Cured","Cured",NA
+"32","28TB-D09-003","Cured","Cured","Cured",NA
+"33","28TB-D09-004","Treatment Completed","Failed","Failed",NA
+"34","28TB-D09-005","Cured","Cured","Cured",NA
+"35","28TB-D09-006","Cured","Cured","Cured",NA
+"36","28TB-D09-007","Cured","Cured","Cured","Consistantly_neg"
+"37","28TB-D09-008","Cured","Cured","Cured",NA
+"38","28TB-D09-009","Cured","Cured","Cured",NA
+"39","28TB-D09-010","Cured","Cured","Cured",NA
+"40","28TB-D09-011","Cured","Treatment Completed","Treatment Completed",NA
+"41","28TB-D09-012","Died","Died","Died",NA
+"42","28TB-D12-001","Cured","Cured","Cured",NA
+"43","28TB-D12-002","Cured","Cured","Cured",NA
+"44","28TB-D12-004","Cured","Cured","Cured",NA
+"45","28TB-D12-005","Cured","Cured","Cured",NA
+"46","28TB-D12-006","Treatment Completed","Failed","Failed",NA
+"47","28TB-D12-007","Cured","Failed","Failed",NA
+"48","28TB-D12-008","Cured","Failed","Failed",NA
+"49","28TB-D12-009","Cured","Treatment Completed","Treatment Completed",NA
+"50","28TB-D12-010","Cured","Cured","Cured",NA
+"51","28TB-D12-011","Cured","Treatment Completed","Cured",NA
+"52","28TB-D12-012","Cured","Cured","Cured",NA
+"53","28TB-D12-013","Cured","Cured","Cured",NA
+"54","28TB-D13-001","Cured","Cured","Cured",NA
+"55","28TB-D13-002","Cured","Cured","Cured",NA
+"56","28TB-D13-003","Cured","Cured","Cured",NA
+"57","28TB-D13-004","Cured","Cured","Cured",NA
+"58","28TB-D13-005","LOSTFU","LOSTFU","LOSTFU",NA
+"59","28TB-D13-006","Cured","Failed","Failed",NA
+"60","28TB-D13-007","Cured","Cured","Cured",NA
+"61","28TB-D13-008","Cured","Cured","Cured","MDR-Denovo"
+"62","28TB-D14-001","Cured","Cured","Cured",NA
+"63","28TB-D14-003","Cured","Treatment Completed","Treatment Completed",NA
+"64","28TB-D14-004","Cured","Cured","Cured",NA
+"65","28TB-D15-001","Cured","Cured","Cured",NA
+"66","28TB-D15-002","Cured","Cured","Cured",NA
+"67","28TB-D15-003","Cured","Cured","Cured",NA
+"68","28TB-D15-005","LOSTFU","LOSTFU","LOSTFU",NA
+"69","28TB-D15-006","Treatment Completed","Cured","Cured",NA
+"70","28TB-D15-007","LOSTFU","LOSTFU","LOSTFU",NA
+"71","28TB-D15-008","Cured","Cured","Cured","Consistantly_neg"
+"72","28TB-D15-009","Treatment Completed","Failed","Failed",NA
+"73","28TB-D15-010","Cured","Cured","Cured",NA
+"74","28TB-D15-011","Treatment Completed","Cured","Cured",NA
+"75","28TB-D15-012","Cured","Cured","Cured",NA
+"76","28TB-D15-013","LOSTFU","LOSTFU","LOSTFU",NA
+"77","28TB-D15-014","Cured","Failed","Cured",NA
+"78","28TB-D15-015","LOSTFU","LOSTFU","LOSTFU",NA
+"79","28TB-D15-016","Cured","Cured","Cured",NA
+"80","28TB-D15-017","LOSTFU","LOSTFU","LOSTFU",NA
+"81","28TB-D15-018","Failed","Cured","Cured",NA
+"82","28TB-D15-019","Cured","Cured","Cured",NA
+"83","28TB-D15-020","LOSTFU","LOSTFU","LOSTFU",NA
+"84","28TB-D15-021","Cured","Cured","Cured","Consistantly_neg"
+"85","28TB-D15-022","Died","Died","Died",NA
+"86","28TB-D15-023","Cured","Cured","Cured",NA
+"87","28TB-D15-024","Cured","Failed","Failed",NA
+"88","28TB-D15-025","Cured","Cured","Cured",NA
+"89","28TB-D15-026","LOSTFU","LOSTFU","LOSTFU","Consistantly_neg"
+"90","28TB-D15-027","Cured","Cured","Cured",NA
+"91","28TB-D15-029","Cured","Cured","Cured",NA
+"92","28TB-D16-001","Cured","Cured","Cured",NA
+"93","28TB-D16-002","Treatment Completed","Cured","Cured",NA
+"94","28TB-D16-003","Cured","Cured","Cured",NA
+"95","28TB-D16-004","Treatment Completed","Cured","Cured",NA
+"96","28TB-D16-005","Cured","Failed","Cured",NA
+"97","28TB-D16-006","Cured","Cured","Cured",NA
+"98","28TB-D16-007","Cured","Cured","Cured",NA
+"99","28TB-D18-001","Treatment Completed","Failed","Failed",NA
+"100","28TB-D18-002","Cured","Cured","Cured",NA
+"101","28TB-D18-003","Cured","Cured","Cured",NA
+"102","28TB-D18-004","Cured","Cured","Cured",NA
+"103","28TB-D18-005","Cured","Cured","Cured",NA
+"104","28TB-D18-006","Cured","Treatment Completed","Treatment Completed",NA
+"105","28TB-D18-007","Cured","Cured","Cured",NA
+"106","28TB-D19-001","Cured","Failed","Failed",NA
+"107","28TB-D19-002","Cured","Cured","Cured",NA
+"108","28TB-D19-003","Cured","Cured","Cured",NA
+"109","28TB-D19-004","Cured","Failed","Failed",NA
+"110","28TB-D19-005","Cured","Cured","Cured",NA
+"111","28TB-D19-006","LOSTFU","LOSTFU","LOSTFU",NA
+"112","28TB-D19-007","Cured","Cured","Cured",NA
+"113","28TB-D19-008","Failed","Failed","Failed",NA
+"114","28TB-D19-009","Cured","Cured","Cured",NA
+"115","28TB-D19-010","Cured","Cured","Cured",NA
+"116","28TB-D19-011","LOSTFU","LOSTFU","LOSTFU",NA
+"117","28TB-D19-012","Failed","Cured","Failed",NA
+"118","28TB-D19-013","Cured","Cured","Cured",NA
+"119","28TB-D19-014","Cured","Cured","Cured",NA
+"120","28TB-D20-001","Cured","Cured","Cured",NA
+"121","28TB-D20-002","Died","Died","Died",NA
+"122","28TB-D20-003","Cured","Treatment Completed","Treatment Completed",NA
+"123","28TB-D20-004","Cured","Cured","Cured",NA
+"124","28TB-D25-001","LOSTFU","LOSTFU","LOSTFU",NA
+"125","28TB-D25-002","Cured","Cured","Cured",NA
+"126","28TB-D25-003","Cured","Treatment Completed","Treatment Completed",NA
+"127","28TB-D25-004","Cured","Cured","Cured",NA
+"128","28TB-D25-005","LOSTFU","LOSTFU","LOSTFU",NA
+"129","28TB-D25-006",NA,"Treatment Completed","Treatment Completed",NA
+"130","28TB-D25-007","LOSTFU","LOSTFU","LOSTFU",NA
+"131","28TB-D25-008","Cured","Treatment Completed","Treatment Completed",NA
+"132","28TB-D25-009","LOSTFU","LOSTFU","LOSTFU",NA
+"133","28TB-D25-010",NA,"Treatment Completed","Treatment Completed",NA
+"134","28TB-D25-011","Died","Died","Died",NA
+"135","28TB-D25-012","Cured","Cured","Cured",NA
+"136","28TB-D25-013","Died","Died","Died",NA
+"137","28TB-D25-014","LOSTFU","LOSTFU","LOSTFU",NA
+"138","28TB-D25-015","Died","Died","Died",NA
+"139","28TB-D25-016","Cured","Cured","Cured",NA
+"140","28TB-D25-017","Died","Died","Died",NA
+"141","28TB-D25-018","Cured","Cured","Cured",NA
+"142","28TB-D25-019","Cured","Cured","Cured",NA
+"143","28TB-D25-020","Cured","Cured","Cured",NA
+"144","28TB-D25-021","Cured","Cured","Cured",NA
+"145","28TB-D25-022","Treatment Completed","Cured","Cured",NA
+"146","28TB-D25-023","Failed","Failed","Failed",NA
+"147","28TB-D25-024","Cured","Failed","Failed",NA
+"148","28TB-D25-025","Died","Died","Died","Consistantly_neg"
+"149","28TB-D25-026","LOSTFU","LOSTFU","LOSTFU",NA
+"150","28TB-D25-027","Cured","Cured","Cured",NA
+"151","28TB-D25-028","Cured","Cured","Cured",NA
+"152","28TB-D25-029","Died","Died","Died",NA
+"153","28TB-D25-030","Failed","Failed","Failed",NA
+"154","28TB-D25-031","Cured","Failed","Failed",NA
+"155","28TB-D25-032","Cured","Cured","Cured",NA
+"156","28TB-D25-033","Cured","Cured","Cured",NA
+"157","28TB-D25-034","Cured","Cured","Cured",NA
+"158","28TB-D25-035","Cured","Cured","Cured",NA
+"159","28TB-D25-036","Cured","Cured","Cured",NA
+"160","28TB-D25-037","Cured","Cured","Cured",NA
+"161","28TB-D25-038","Cured","Cured","Cured",NA
+"162","28TB-D25-039","Failed","Cured","Failed",NA
+"163","28TB-D25-040","Failed","Failed","Failed",NA
+"164","28TB-D25-041","Cured","Cured","Cured",NA
+"165","28TB-D25-042","LOSTFU","LOSTFU","LOSTFU",NA
+"166","28TB-D25-043","Cured","Cured","Cured",NA
+"167","28TB-D25-044","Cured","Treatment Completed","Treatment Completed",NA
+"168","28TB-D25-045","Treatment Completed","Treatment Completed","Treatment Completed",NA
+"169","28TB-D25-046","Failed","Failed","Failed",NA
+"170","28TB-D25-047","Failed","Failed","Failed",NA
+"171","28TB-D25-048","Failed","Failed","Failed",NA
+"172","28TB-D25-049","Cured","Cured","Cured",NA
+"173","28TB-D25-050","Cured","Cured","Cured",NA
+"174","28TB-D25-051","Cured","Failed","Failed",NA
+"175","28TB-D25-052","Cured","Failed","Failed",NA
+"176","28TB-D25-053","Cured","Treatment Completed","Treatment Completed",NA
+"177","28TB-D25-054","Cured","Cured","Cured",NA
+"178","28TB-D25-055","LOSTFU","LOSTFU","LOSTFU",NA
+"179","28TB-D25-056","LOSTFU","LOSTFU","LOSTFU",NA
+"180","28TB-D25-057","Cured","Cured","Cured",NA
+"181","28TB-D25-058","Cured","Treatment Completed","Treatment Completed",NA
+"182","28TB-D25-059","Cured","Cured","Cured",NA
+"183","28TB-D25-061","Cured","Cured","Cured",NA
+"184","28TB-D25-062","LOSTFU","LOSTFU","LOSTFU","Consistantly_neg"
+"185","28TB-D25-063","Cured","Cured","Cured",NA
+"186","28TB-D25-064","Cured","Cured","Cured",NA
+"187","28TB-D25-065","Cured","Cured","Cured",NA
+"188","28TB-D25-066","Cured","Failed","Failed",NA
+"189","28TB-D25-067","Cured","Cured","Cured",NA
+"190","28TB-D25-068","Cured","Cured","Cured","Consistantly_neg"
+"191","28TB-D25-069","Died","Died","Died",NA
+"192","28TB-D25-070","Cured","Failed","Failed",NA
+"193","28TB-D25-071","Cured","Cured","Cured","Consistantly_neg"
+"194","28TB-D25-072","Cured","Cured","Cured",NA
+"195","28TB-D25-073","Treatment Completed","Failed","Failed",NA
+"196","28TB-D25-074","Cured","Failed","Failed",NA
+"197","28TB-D25-075","Cured","Cured","Cured",NA
+"198","28TB-D25-076","Cured","Cured","Cured",NA
+"199","28TB-D25-077","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"200","28TB-D25-078","Cured","Treatment Completed","Treatment Completed",NA
+"201","28TB-D25-079","Cured","Cured","Cured",NA
+"202","28TB-D25-080","Cured","Cured","Cured",NA
+"203","28TB-D25-081","Failed","Treatment Completed","Failed",NA
+"204","28TB-D25-082","Failed","Treatment Completed","Failed",NA
+"205","28TB-D25-083","Died","Died","Died",NA
+"206","28TB-D25-084","Cured","Cured","Cured",NA
+"207","28TB-D25-085","Cured","Failed","Cured",NA
+"208","28TB-D25-086","Cured","Cured","Cured",NA
+"209","28TB-D25-087","Failed","Treatment Completed","Treatment Completed",NA
+"210","28TB-D25-088","Cured","Cured","Cured",NA
+"211","28TB-D25-089","Cured","Cured","Cured",NA
+"212","28TB-D25-090","Cured","Failed","Failed",NA
+"213","28TB-D25-091","LOSTFU","LOSTFU","LOSTFU",NA
+"214","28TB-D25-092","LOSTFU","LOSTFU","LOSTFU",NA
+"215","28TB-D25-093","Cured","Cured","Cured",NA
+"216","28TB-D25-094","Cured","Cured","Cured",NA
+"217","28TB-D25-095","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"218","28TB-D25-096","Cured","Failed","Failed",NA
+"219","28TB-D25-097","Cured","Cured","Cured",NA
+"220","28TB-D25-098","LOSTFU","LOSTFU","LOSTFU",NA
+"221","28TB-D25-099","Cured","Cured","Cured",NA
+"222","28TB-D25-100","Failed","Failed","Failed",NA
+"223","28TB-D25-101","Failed","Cured","Failed",NA
+"224","28TB-D25-102","Cured","Cured","Cured",NA
+"225","28TB-D25-103","Cured","Cured","Cured",NA
+"226","28TB-D25-104","Cured","Cured","Cured",NA
+"227","28TB-D25-105","Cured","Cured","Cured",NA
+"228","28TB-D25-106","Treatment Completed","Cured","Cured",NA
+"229","28TB-D25-107","Cured","Treatment Completed","Treatment Completed",NA
+"230","28TB-D25-108","Cured","Cured","Cured",NA
+"231","28TB-D25-109","Cured","Treatment Completed","Treatment Completed",NA
+"232","28TB-D25-110","LOSTFU","LOSTFU","LOSTFU",NA
+"233","28TB-D25-111","Cured","Cured","Cured",NA
+"234","28TB-D25-112","Cured","Cured","Cured",NA
+"235","28TB-D25-113","Cured","Cured","Cured","Consistantly_neg"
+"236","28TB-D25-114","Cured","Cured","Cured",NA
+"237","28TB-D25-115","Cured","Cured","Cured",NA
+"238","28TB-D25-116","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"239","28TB-D25-117","Cured","Cured","Cured","Consistantly_neg"
+"240","28TB-D25-118","Cured","Failed","Failed",NA
+"241","28TB-D25-119","Cured","Treatment Completed","Treatment Completed",NA
+"242","28TB-D25-120","Cured","Cured","Cured",NA
+"243","28TB-D25-121","LOSTFU","LOSTFU","LOSTFU",NA
+"244","28TB-D25-122","Cured","Cured","Cured",NA
+"245","28TB-D25-123","Cured","Treatment Completed","Treatment Completed",NA
+"246","28TB-D25-124","LOSTFU","LOSTFU","LOSTFU",NA
+"247","28TB-D25-125","Cured","Cured","Cured",NA
+"248","28TB-D25-126","Treatment Completed","Failed","Failed",NA
+"249","28TB-D25-127","Cured","Cured","Cured",NA
+"250","28TB-D25-128","Cured","Treatment Completed","Treatment Completed",NA
+"251","28TB-D25-130","Cured","Cured","Cured",NA
+"252","28TB-D25-131","LOSTFU","LOSTFU","LOSTFU","Consistantly_neg"
+"253","28TB-D25-132","Cured","Cured","Cured","Consistantly_neg"
+"254","28TB-D25-133","Cured","Treatment Completed","Treatment Completed",NA
+"255","28TB-D25-134","Cured","Cured","Cured",NA
+"256","28TB-D25-135","Cured","Cured","Cured",NA
+"257","28TB-D25-136","Cured","Cured","Cured",NA
+"258","28TB-D25-137","Cured","Cured","Cured",NA
+"259","28TB-D25-138","Cured","Failed","Cured",NA
+"260","28TB-D25-139","Treatment Completed","Cured","Cured",NA
+"261","28TB-D25-140","Cured","Cured","Cured",NA
+"262","28TB-D25-141","Cured","Cured","Cured",NA
+"263","28TB-D25-142","Cured","Cured","Cured",NA
+"264","28TB-D25-143","Cured","Cured","Cured",NA
+"265","28TB-D25-145","Failed","Treatment Completed","Treatment Completed",NA
+"266","28TB-D25-146","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"267","28TB-D25-147","LOSTFU","LOSTFU","LOSTFU",NA
+"268","28TB-D25-148","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"269","28TB-D25-149","Cured","Cured","Cured",NA
+"270","28TB-D25-150","Treatment Completed","Cured","Cured",NA
+"271","28TB-D25-151","LOSTFU","LOSTFU","LOSTFU",NA
+"272","28TB-D25-152","LOSTFU","LOSTFU","LOSTFU",NA
+"273","28TB-D25-153","Cured","Cured","Cured",NA
+"274","28TB-D25-154","Cured","Cured","Cured",NA
+"275","28TB-D25-155","Cured","Cured","Cured",NA
+"276","28TB-D25-156","Cured","Cured","Cured",NA
+"277","28TB-D25-157","Cured","Cured","Cured",NA
+"278","28TB-D25-158","LOSTFU","LOSTFU","LOSTFU",NA
+"279","28TB-D25-159","Failed","Treatment Completed","Treatment Completed",NA
+"280","28TB-D25-160","Cured","Cured","Cured",NA
+"281","28TB-D25-161","Cured","Cured","Treatment Completed",NA
+"282","28TB-D25-162","Cured","Cured","Cured",NA
+"283","28TB-D25-164","Cured","Cured","Cured",NA
+"284","28TB-D25-165","Cured","Cured","Cured",NA
+"285","28TB-D25-166","Cured","Cured","Cured",NA
+"286","28TB-D25-167","Cured","Cured","Cured",NA
+"287","28TB-D25-168","Failed","Cured","Failed",NA
+"288","28TB-D25-169","Cured","Treatment Completed","Treatment Completed",NA
+"289","28TB-D25-170","Treatment Completed","Cured","Cured",NA
+"290","28TB-D25-171","Treatment Completed","Treatment Completed","Treatment Completed",NA
+"291","28TB-D25-172","Treatment Completed","Failed","Failed",NA
+"292","28TB-D25-173","Cured","Treatment Completed","Treatment Completed",NA
+"293","28TB-D25-174","Cured","Cured","Cured",NA
+"294","28TB-D25-175","Cured","Treatment Completed","Treatment Completed",NA
+"295","28TB-D25-176","LOSTFU","LOSTFU","LOSTFU",NA
+"296","28TB-D25-177","Cured","Cured","Cured",NA
+"297","28TB-D25-178","Cured","Treatment Completed","Treatment Completed",NA
+"298","28TB-D25-179","Cured","Cured","Cured",NA
+"299","28TB-D25-180","LOSTFU","LOSTFU","LOSTFU",NA
+"300","28TB-D25-181","Cured","Cured","Cured",NA
+"301","28TB-D25-182","Treatment Completed","Cured","Cured",NA
+"302","28TB-D25-183","Cured","Cured","Cured",NA
+"303","28TB-D25-184","Cured","Cured","Cured",NA
+"304","28TB-D25-185",NA,"Cured","Cured",NA
+"305","28TB-D25-186","Cured","Cured","Cured",NA
+"306","28TB-D25-187","Failed","Cured","Failed",NA
+"307","28TB-D25-188","Treatment Completed","Treatment Completed","Treatment Completed",NA
+"308","28TB-D25-189","Cured","Treatment Completed","Treatment Completed",NA
+"309","28TB-D25-190","Cured","Failed","Failed",NA
+"310","28TB-D25-191","LOSTFU","LOSTFU","LOSTFU",NA
+"311","28TB-D25-192","Failed","Failed","Failed",NA
+"312","28TB-D25-193","LOSTFU","LOSTFU","LOSTFU",NA
+"313","29TB-D01-001","Cured","Failed","Failed",NA
+"314","29TB-D01-002","Cured","Failed","Failed",NA
+"315","29TB-D01-003","Died","Died","Died",NA
+"316","29TB-D01-004","Cured","Cured","Cured",NA
+"317","29TB-D01-005","Cured","Cured","Cured",NA
+"318","29TB-D01-006","Cured","Cured","Cured",NA
+"319","29TB-D01-007","Died","Died","Died",NA
+"320","29TB-D01-008","Cured","Cured","Cured",NA
+"321","29TB-D01-009","Cured","Cured","Cured",NA
+"322","29TB-D01-010","Cured","Treatment Completed","Treatment Completed",NA
+"323","29TB-D01-011","Cured","Failed","Failed",NA
+"324","29TB-D01-013","Cured","Cured","Cured",NA
+"325","29TB-D01-014","Cured","Treatment Completed","Treatment Completed",NA
+"326","29TB-D01-015","Failed","Failed","Failed",NA
+"327","29TB-D01-016","Cured","Cured","Cured",NA
+"328","29TB-D01-017","Cured","Cured","Cured",NA
+"329","29TB-D04-001","Cured","Treatment Completed","Treatment Completed",NA
+"330","29TB-D04-002","Cured","Cured","Cured",NA
+"331","29TB-D04-003","Cured","Treatment Completed","Treatment Completed",NA
+"332","29TB-D04-004","Cured","Cured","Cured",NA
+"333","29TB-D04-005","Cured","Cured","Cured",NA
+"334","29TB-D04-006","Cured","Treatment Completed","Treatment Completed",NA
+"335","29TB-D04-007","Cured","Failed","Failed",NA
+"336","29TB-D04-008","Cured","Cured","Cured",NA
+"337","29TB-D04-009","Cured","Cured","Cured",NA
+"338","29TB-D04-010","Cured","Cured","Cured",NA
+"339","29TB-D04-011","Cured","Cured","Cured",NA
+"340","29TB-D04-012","Cured","Treatment Completed","Treatment Completed",NA
+"341","29TB-D04-013","Cured","Cured","Cured",NA
+"342","29TB-D04-014","Cured","Cured","Cured",NA
+"343","29TB-D04-015","Cured","Cured","Cured",NA
+"344","29TB-D04-016","Cured","Treatment Completed","Treatment Completed",NA
+"345","29TB-D04-017","Cured","Cured","Cured",NA
+"346","29TB-D04-018","Cured","Cured","Cured",NA
+"347","29TB-D04-019","Cured","Cured","Cured",NA
+"348","29TB-D04-020","Cured","Cured","Cured",NA
+"349","29TB-D04-021","Cured","Cured","Cured",NA
+"350","29TB-D04-022","Cured","Cured","Cured",NA
+"351","29TB-D04-023","LOSTFU","LOSTFU","LOSTFU",NA
+"352","29TB-D04-024","Cured","Failed","Failed",NA
+"353","29TB-D04-025","LOSTFU","LOSTFU","LOSTFU",NA
+"354","29TB-D06-001","Cured","Treatment Completed","Treatment Completed",NA
+"355","29TB-D06-002","Cured","Cured","Cured",NA
+"356","29TB-D06-003","Cured","Treatment Completed","Treatment Completed",NA
+"357","29TB-D06-004","Cured","Cured","Cured",NA
+"358","29TB-D06-005","Cured","Cured","Cured",NA
+"359","29TB-D06-006","Cured","Cured","Cured",NA
+"360","29TB-D06-007","Cured","Cured","Cured",NA
+"361","29TB-D06-008","Cured","Cured","Cured",NA
+"362","29TB-D06-009","Cured","Treatment Completed","Treatment Completed",NA
+"363","29TB-D06-010","Cured","Cured","Cured",NA
+"364","29TB-D06-011","Cured","Treatment Completed","Treatment Completed",NA
+"365","29TB-D06-012","Cured","Treatment Completed","Treatment Completed",NA
+"366","29TB-D06-013","Cured","Failed","Failed",NA
+"367","29TB-D06-014","Cured","Cured","Cured",NA
+"368","29TB-D06-015","Cured","Treatment Completed","Treatment Completed",NA
+"369","29TB-D06-016","Cured","Treatment Completed","Treatment Completed",NA
+"370","29TB-D06-017","Cured","Cured","Cured",NA
+"371","29TB-D06-018","Cured","Treatment Completed","Treatment Completed",NA
+"372","29TB-D06-019","Cured","Treatment Completed","Treatment Completed",NA
+"373","29TB-D06-020","Cured","Cured","Cured",NA
+"374","29TB-D06-021","Cured","Cured","Cured",NA
+"375","29TB-D06-022","Cured","Cured","Cured",NA
+"376","29TB-D06-023","Cured","Cured","Cured",NA
+"377","29TB-D06-024","Cured","Cured","Cured",NA
+"378","29TB-D06-025","Cured","Treatment Completed","Treatment Completed",NA
+"379","29TB-D06-026","Cured","Failed","Failed",NA
+"380","29TB-D06-027","Cured","Treatment Completed","Treatment Completed",NA
+"381","29TB-D06-028","Cured","Cured","Cured",NA
+"382","29TB-D06-029","Failed","Cured","Cured",NA
+"383","29TB-D06-030","Cured","Treatment Completed","Treatment Completed",NA
+"384","29TB-D06-031","Cured","Treatment Completed","Treatment Completed",NA
+"385","29TB-D06-032","Cured","Treatment Completed","Treatment Completed",NA
+"386","29TB-D08-001","Cured","Treatment Completed","Treatment Completed",NA
+"387","29TB-D08-002","Cured","Treatment Completed","Treatment Completed",NA
+"388","29TB-D08-004","Cured","Cured","Cured",NA
+"389","29TB-D08-005","Cured","Treatment Completed","Treatment Completed",NA
+"390","29TB-D08-006","Cured","Failed","Failed",NA
+"391","29TB-D08-007","Cured","Cured","Cured",NA
+"392","29TB-D08-008","Cured","Cured","Cured",NA
+"393","29TB-D08-009","Cured","Treatment Completed","Treatment Completed",NA
+"394","29TB-D08-010","Cured","Treatment Completed","Treatment Completed",NA
+"395","29TB-D08-011","Cured","Treatment Completed","Treatment Completed",NA
+"396","29TB-D08-012","Cured","Treatment Completed","Treatment Completed",NA
+"397","29TB-D08-013","Cured","Cured","Cured",NA
+"398","29TB-D08-014","Cured","Treatment Completed","Treatment Completed",NA
+"399","29TB-D08-015","Cured","Treatment Completed","Treatment Completed",NA
+"400","29TB-D08-016","Cured","Treatment Completed","Treatment Completed",NA
+"401","29TB-D09-001","Cured","Failed","Failed",NA
+"402","29TB-D09-002","Cured","Cured","Cured",NA
+"403","29TB-D09-003","Cured","Cured","Cured",NA
+"404","29TB-D09-004","Cured","Failed","Failed",NA
+"405","29TB-D09-005","Cured","Cured","Cured",NA
+"406","29TB-D09-006","Cured","Failed","Failed",NA
+"407","29TB-D09-007","Cured","Treatment Completed","Treatment Completed",NA
+"408","29TB-D09-008","LOSTFU","LOSTFU","LOSTFU",NA
+"409","29TB-D09-009","Cured","Cured","Cured",NA
+"410","29TB-D09-010","Cured","Cured","Cured",NA
+"411","29TB-D09-011","Cured","Treatment Completed","Treatment Completed",NA
+"412","29TB-D09-012","Cured","Cured","Cured",NA
+"413","29TB-D09-013","Cured","Treatment Completed","Treatment Completed",NA
+"414","29TB-D09-014","Cured","Cured","Cured",NA
+"415","29TB-D09-015","Cured","Cured","Cured",NA
+"416","29TB-D09-016","Cured","Cured","Cured",NA
+"417","29TB-D09-017","Cured","Failed","Failed",NA
+"418","29TB-D09-018","Cured","Cured","Cured",NA
+"419","29TB-D09-019","Cured","Treatment Completed","Treatment Completed",NA
+"420","29TB-D09-020","Cured","Cured","Cured",NA
+"421","29TB-D09-021","Cured","Failed","Failed",NA
+"422","29TB-D09-022","Cured","Failed","Failed",NA
+"423","29TB-D09-023","LOSTFU","LOSTFU","LOSTFU",NA
+"424","29TB-D09-024","Cured","Cured","Cured",NA
+"425","29TB-D09-025","Cured","Cured","Cured",NA
+"426","29TB-D09-026","LOSTFU","LOSTFU","LOSTFU",NA
+"427","29TB-D09-027","Cured","Treatment Completed","Treatment Completed",NA
+"428","29TB-D09-028","Cured","Treatment Completed","Treatment Completed",NA
+"429","29TB-D09-029","Cured","Cured","Cured",NA
+"430","29TB-D09-030","Cured","Cured","Cured",NA
+"431","29TB-D09-031","Cured","Cured","Cured",NA
+"432","29TB-D09-032","Cured","Cured","Cured",NA
+"433","29TB-D09-033","Cured","Cured","Cured",NA
+"434","29TB-D09-034","Cured","Cured","Cured",NA
+"435","29TB-D09-035","Cured","Cured","Cured",NA
+"436","29TB-D09-036","Cured","Cured","Cured",NA
+"437","29TB-D09-037","Cured","Cured","Cured",NA
+"438","29TB-D09-038","LOSTFU","LOSTFU","LOSTFU",NA
+"439","29TB-D09-039","Cured","Treatment Completed","Treatment Completed",NA
+"440","29TB-D09-041","Cured","Cured","Cured",NA
+"441","29TB-D09-043","Cured","Cured","Cured",NA
+"442","29TB-D09-044","Cured","Cured","Cured",NA
+"443","29TB-D09-045","Cured","Cured","Cured",NA
+"444","29TB-D09-046","Cured","Cured","Cured",NA
+"445","29TB-D09-048","Cured","Failed","Failed",NA
+"446","29TB-D09-049","Cured","Treatment Completed","Treatment Completed",NA
+"447","29TB-D09-051","Cured","Cured","Cured",NA
+"448","29TB-D09-052","Cured","Failed","Failed",NA
+"449","29TB-D09-053","Cured","Cured","Cured",NA
+"450","29TB-D09-054","Cured","Failed","Failed",NA
+"451","29TB-D09-055","Cured","Cured","Cured",NA
+"452","29TB-D09-056","Cured","Cured","Cured",NA
+"453","29TB-D09-057","LOSTFU","LOSTFU","LOSTFU",NA
+"454","29TB-D09-059","Cured","Failed","Failed",NA
+"455","29TB-D09-060","Cured","Treatment Completed","Treatment Completed",NA
+"456","29TB-D09-061","Cured","Cured","Cured",NA
+"457","29TB-D09-062","Cured","Treatment Completed","Treatment Completed",NA
+"458","29TB-D09-063","Cured","Cured","Cured",NA
+"459","29TB-D09-064","Cured","Failed","Failed",NA
+"460","29TB-D09-065","Cured","Cured","Cured",NA
+"461","29TB-D09-066","Cured","Failed","Failed",NA
+"462","29TB-D09-067","Cured","Cured","Cured",NA
+"463","29TB-D09-068","Cured","Cured","Cured",NA
+"464","29TB-D09-069","Cured","Cured","Cured",NA
+"465","29TB-D09-070","Cured","Cured","Cured",NA
+"466","29TB-D09-071","Cured","Cured","Cured",NA
+"467","29TB-D09-072","Cured","Cured","Cured",NA
+"468","29TB-D09-074","Cured","Cured","Cured",NA
+"469","29TB-D09-075","Cured","Cured","Cured",NA
+"470","29TB-D09-076","Cured","Cured","Cured",NA
+"471","29TB-D09-077","Cured","Treatment Completed","Treatment Completed",NA
+"472","29TB-D09-078","Cured","Treatment Completed","Treatment Completed",NA
+"473","29TB-D09-079","Cured","Cured","Cured",NA
+"474","29TB-D09-080","Cured","Treatment Completed","Treatment Completed",NA
+"475","29TB-D09-081","Cured","Cured","Cured",NA
+"476","29TB-D09-083","Cured","Cured","Cured",NA
+"477","29TB-D09-084","Cured","Cured","Cured",NA
+"478","29TB-D09-085","Died","Died","Died",NA
+"479","29TB-D09-086","Cured","Failed","Failed",NA
+"480","29TB-D09-087","Cured","Failed","Failed",NA
+"481","29TB-D09-091","Cured","Failed","Failed",NA
+"482","29TB-D09-092","Cured","Cured","Cured",NA
+"483","29TB-D12-001","Cured","Cured","Cured",NA
+"484","29TB-D12-002","Cured","Treatment Completed","Treatment Completed",NA
+"485","29TB-D12-003","Cured","Treatment Completed","Treatment Completed",NA
+"486","29TB-D12-004","Cured","Cured","Cured",NA
+"487","29TB-D12-005","Cured","Cured","Cured",NA
+"488","29TB-D12-006","Cured","Cured","Cured",NA
+"489","29TB-D12-007","Cured","Cured","Cured",NA
+"490","29TB-D12-008","Cured","Cured","Cured",NA
+"491","29TB-D12-009","Cured","Cured","Cured",NA
+"492","29TB-D12-010","Cured","Cured","Cured",NA
+"493","29TB-D12-011","Cured","Cured","Cured",NA
+"494","29TB-D12-012","Cured","Cured","Cured",NA
+"495","29TB-D12-013","Cured","Cured","Cured",NA
+"496","29TB-D12-014","Cured","Cured","Cured",NA
+"497","29TB-D12-015","Cured","Treatment Completed","Treatment Completed",NA
+"498","29TB-D12-016","Cured","Cured","Cured",NA
+"499","29TB-D12-017","Cured","Cured","Cured",NA
+"500","29TB-D12-018","Cured","Failed","Failed",NA
+"501","29TB-D12-019","Cured","Cured","Cured",NA
+"502","29TB-D12-020","Cured","Treatment Completed","Treatment Completed",NA
+"503","29TB-D12-021","Cured","Failed","Failed",NA
+"504","29TB-D12-022","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"505","29TB-D12-023","Died","Died","Died",NA
+"506","29TB-D12-024","Cured","Cured","Cured",NA
+"507","29TB-D12-025","Cured","Cured","Cured",NA
+"508","29TB-D12-026","Cured","Failed","Failed",NA
+"509","29TB-D12-027","Cured","Cured","Cured",NA
+"510","29TB-D12-028","Cured","Treatment Completed","Treatment Completed",NA
+"511","29TB-D12-029","Cured","Treatment Completed","Treatment Completed",NA
+"512","29TB-D12-031","Cured","Treatment Completed","Treatment Completed",NA
+"513","29TB-D12-032","Cured","Cured","Cured",NA
+"514","29TB-D12-033","Cured","Cured","Cured",NA
+"515","29TB-D12-034","Cured","Treatment Completed","Treatment Completed",NA
+"516","29TB-D12-035","Cured","Failed","Failed",NA
+"517","29TB-D12-036","Cured","Failed","Failed",NA
+"518","29TB-D12-037","Cured","Cured","Cured",NA
+"519","29TB-D12-038","Cured","Treatment Completed","Treatment Completed",NA
+"520","29TB-D12-039","Cured","Cured","Cured",NA
+"521","29TB-D12-040","Cured","Failed","Failed",NA
+"522","29TB-D12-041","Cured","Cured","Cured",NA
+"523","29TB-D12-042","Cured","Cured","Cured",NA
+"524","29TB-D12-043","Cured","Cured","Cured",NA
+"525","29TB-D12-044","Cured","Cured","Cured",NA
+"526","29TB-D12-045","Cured","Cured","Cured",NA
+"527","29TB-D12-046","Cured","Failed","Failed",NA
+"528","29TB-D12-047","Cured","Cured","Cured",NA
+"529","29TB-D12-048","Cured","Cured","Cured",NA
+"530","29TB-D12-049","Cured","Cured","Cured",NA
+"531","29TB-D12-050","Cured","Cured","Cured",NA
+"532","29TB-D12-051","Cured","Treatment Completed","Treatment Completed",NA
+"533","29TB-D12-052","Cured","Failed","Failed",NA
+"534","29TB-D12-053","Cured","Cured","Cured",NA
+"535","29TB-D12-054","Cured","Cured","Cured",NA
+"536","29TB-D12-055","Cured","Treatment Completed","Treatment Completed",NA
+"537","29TB-D12-056","Cured","Cured","Cured",NA
+"538","29TB-D12-057","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"539","29TB-D12-058","Cured","Cured","Cured",NA
+"540","29TB-D12-059","Cured","Cured","Cured",NA
+"541","29TB-D12-060","Cured","Cured","Cured",NA
+"542","29TB-D12-061","Cured","Cured","Cured",NA
+"543","29TB-D12-062","Cured","Cured","Cured",NA
+"544","29TB-D12-063","Cured","Treatment Completed","Treatment Completed",NA
+"545","29TB-D12-064","Cured","Cured","Cured",NA
+"546","29TB-D12-065","Cured","Treatment Completed","Treatment Completed",NA
+"547","29TB-D12-066","Cured","Cured","Cured",NA
+"548","29TB-D12-068","Cured","Cured","Cured",NA
+"549","29TB-D12-069","Cured","Cured","Cured",NA
+"550","29TB-D12-070","Cured","Failed","Failed",NA
+"551","29TB-D12-071","Cured","Treatment Completed","Treatment Completed",NA
+"552","29TB-D12-072","Cured","Treatment Completed","Treatment Completed",NA
+"553","29TB-D12-073","Cured","Cured","Cured",NA
+"554","29TB-D12-074","Cured","Treatment Completed","Treatment Completed",NA
+"555","29TB-D12-075","Cured","Cured","Cured",NA
+"556","29TB-D12-076","Cured","Cured","Cured",NA
+"557","29TB-D12-077","Cured","Cured","Cured",NA
+"558","29TB-D12-078","LOSTFU","LOSTFU","LOSTFU","Consistantly_neg"
+"559","29TB-D12-079","Cured","Cured","Cured",NA
+"560","29TB-D12-080","Cured","Cured","Cured",NA
+"561","29TB-D12-081","Cured","Cured","Cured",NA
+"562","29TB-D12-082","Cured","Cured","Cured",NA
+"563","29TB-D12-083","Cured","Cured","Cured",NA
+"564","29TB-D12-084","Cured","Cured","Cured",NA
+"565","29TB-D12-085","Cured","Cured","Cured",NA
+"566","29TB-D12-086","Cured","Cured","Cured",NA
+"567","29TB-D12-087","Cured","Cured","Cured",NA
+"568","29TB-D12-088","Cured","Cured","Cured",NA
+"569","29TB-D12-089","Cured","Failed","Failed",NA
+"570","29TB-D12-090","Cured","Cured","Cured",NA
+"571","29TB-D12-091","Cured","Treatment Completed","Treatment Completed",NA
+"572","29TB-D12-092","Cured","Cured","Cured",NA
+"573","29TB-D12-093","Cured","Cured","Cured",NA
+"574","29TB-D12-094","Cured","Treatment Completed","Treatment Completed",NA
+"575","29TB-D12-095","Cured","Cured","Cured",NA
+"576","29TB-D12-096","Cured","Treatment Completed","Treatment Completed",NA
+"577","29TB-D12-097","Cured","Cured","Cured",NA
+"578","29TB-D12-098","Cured","Failed","Failed",NA
+"579","29TB-D12-099","Cured","Cured","Cured",NA
+"580","29TB-D12-100","Cured","Cured","Cured",NA
+"581","29TB-D12-101","Cured","Cured","Cured",NA
+"582","29TB-D12-102","Failed","Treatment Completed","Failed",NA
+"583","29TB-D12-103","Cured","Failed","Failed",NA
+"584","29TB-D12-104","Cured","Cured","Cured",NA
+"585","29TB-D12-105","Cured","Cured","Cured",NA
+"586","29TB-D12-106","Cured","Cured","Cured",NA
+"587","29TB-D13-002","Cured","Failed","Failed",NA
+"588","29TB-D13-003","Cured","Cured","Cured",NA
+"589","29TB-D13-004","Cured","Failed","Failed",NA
+"590","29TB-D13-005","Cured","Cured","Cured",NA
+"591","29TB-D13-006","Cured","Cured","Cured",NA
+"592","29TB-D13-007","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"593","29TB-D13-009","Cured","Treatment Completed","Treatment Completed",NA
+"594","29TB-D13-010","Cured","Cured","Cured",NA
+"595","29TB-D13-011","Cured","Treatment Completed","Treatment Completed",NA
+"596","29TB-D13-012","Cured","Treatment Completed","Treatment Completed",NA
+"597","29TB-D13-013","Cured","Treatment Completed","Treatment Completed",NA
+"598","29TB-D13-014","Cured","Treatment Completed","Treatment Completed",NA
+"599","29TB-D13-015","Cured","Treatment Completed","Treatment Completed",NA
+"600","29TB-D13-016","Cured","Treatment Completed","Treatment Completed",NA
+"601","29TB-D13-017","LOSTFU","LOSTFU","LOSTFU",NA
+"602","29TB-D13-018","Cured","Cured","Cured",NA
+"603","29TB-D13-019","Cured","Treatment Completed","Treatment Completed",NA
+"604","29TB-D13-020","Cured","Cured","Cured",NA
+"605","29TB-D13-021","Cured","Cured","Cured",NA
+"606","29TB-D13-022","Cured","Cured","Cured",NA
+"607","29TB-D13-023","Cured","Treatment Completed","Treatment Completed",NA
+"608","29TB-D13-024","Cured","Cured","Cured",NA
+"609","29TB-D13-025","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"610","29TB-D13-026","Cured","Treatment Completed","Treatment Completed",NA
+"611","29TB-D13-027","Cured","Cured","Cured",NA
+"612","29TB-D13-028","Cured","Treatment Completed","Treatment Completed",NA
+"613","29TB-D13-029","Cured","Cured","Cured",NA
+"614","29TB-D13-030","Cured","Cured","Cured",NA
+"615","29TB-D13-031","Cured","Cured","Cured",NA
+"616","29TB-D13-032","Cured","Failed","Failed",NA
+"617","29TB-D13-033","Cured","Cured","Cured",NA
+"618","29TB-D13-034","Cured","Treatment Completed","Treatment Completed",NA
+"619","29TB-D13-035","Cured","Cured","Cured",NA
+"620","29TB-D13-036","Cured","Treatment Completed","Treatment Completed",NA
+"621","29TB-D13-037","Cured","Cured","Cured",NA
+"622","29TB-D13-038","Cured","Treatment Completed","Treatment Completed",NA
+"623","29TB-D13-039","Cured","Cured","Cured",NA
+"624","29TB-D13-040","Cured","Failed","Failed",NA
+"625","29TB-D13-041","Cured","Cured","Cured",NA
+"626","29TB-D13-042","Cured","Cured","Cured",NA
+"627","29TB-D13-043","LOSTFU","LOSTFU","LOSTFU",NA
+"628","29TB-D13-044","LOSTFU","LOSTFU","LOSTFU",NA
+"629","29TB-D13-045","Cured","Cured","Cured",NA
+"630","29TB-D13-046","Cured","Treatment Completed","Treatment Completed",NA
+"631","29TB-D13-047","Cured","Failed","Failed",NA
+"632","29TB-D13-048","Cured","Cured","Cured",NA
+"633","29TB-D13-049","Cured","Cured","Cured",NA
+"634","29TB-D13-050","Cured","Cured","Cured",NA
+"635","29TB-D13-051","Cured","Cured","Cured",NA
+"636","29TB-D13-052","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"637","29TB-D13-053","Cured","Treatment Completed","Treatment Completed",NA
+"638","29TB-D13-054","Cured","Cured","Cured",NA
+"639","29TB-D13-055","Cured","Treatment Completed","Treatment Completed",NA
+"640","29TB-D13-056","Cured","Treatment Completed","Treatment Completed",NA
+"641","29TB-D13-057","Cured","Cured","Cured",NA
+"642","29TB-D13-058","Cured","Cured","Cured",NA
+"643","29TB-D13-059","Cured","Cured","Cured",NA
+"644","29TB-D13-060","Cured","Cured","Cured",NA
+"645","29TB-D13-061","Cured","Cured","Cured",NA
+"646","29TB-D13-062","Cured","Cured","Cured",NA
+"647","29TB-D13-063","Cured","Treatment Completed","Treatment Completed",NA
+"648","29TB-D13-064","Failed","Failed","Failed",NA
+"649","29TB-D13-065","Cured","Treatment Completed","Treatment Completed",NA
+"650","29TB-D13-066","Failed","Treatment Completed","Treatment Completed",NA
+"651","29TB-D13-067","Cured","Cured","Cured",NA
+"652","29TB-D13-068","Cured","Cured","Cured",NA
+"653","29TB-D13-069","Cured","Failed","Failed",NA
+"654","29TB-D13-070","Cured","Treatment Completed","Treatment Completed",NA
+"655","29TB-D14-001","Cured","Cured","Cured",NA
+"656","29TB-D14-002","Cured","Cured","Cured",NA
+"657","29TB-D14-003","Cured","Cured","Cured",NA
+"658","29TB-D14-004","Cured","Treatment Completed","Treatment Completed",NA
+"659","29TB-D14-005","Cured","Treatment Completed","Treatment Completed",NA
+"660","29TB-D14-006","Cured","Treatment Completed","Treatment Completed",NA
+"661","29TB-D14-008","Cured","Treatment Completed","Treatment Completed",NA
+"662","29TB-D14-009","Cured","Treatment Completed","Treatment Completed",NA
+"663","29TB-D14-010","Cured","Treatment Completed","Treatment Completed",NA
+"664","29TB-D14-011","Cured","Treatment Completed","Treatment Completed",NA
+"665","29TB-D14-012","Cured","Treatment Completed","Treatment Completed",NA
+"666","29TB-D14-013","Cured","Treatment Completed","Treatment Completed",NA
+"667","29TB-D14-015","Cured","Treatment Completed","Treatment Completed",NA
+"668","29TB-D15-001","Cured","Cured","Cured",NA
+"669","29TB-D15-002","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"670","29TB-D15-003","Cured","Treatment Completed","Treatment Completed",NA
+"671","29TB-D15-004","Cured","Cured","Cured",NA
+"672","29TB-D15-005","Cured","Treatment Completed","Treatment Completed",NA
+"673","29TB-D15-006","Cured","Cured","Cured",NA
+"674","29TB-D15-007","Cured","Failed","Failed",NA
+"675","29TB-D15-008","Cured","Treatment Completed","Treatment Completed",NA
+"676","29TB-D15-009","Cured","Treatment Completed","Treatment Completed",NA
+"677","29TB-D15-011","Cured","Failed","Failed",NA
+"678","29TB-D15-012","Cured","Cured","Cured",NA
+"679","29TB-D15-013","Cured","Cured","Cured",NA
+"680","29TB-D15-014","Cured","Cured","Cured",NA
+"681","29TB-D15-016","Cured","Cured","Cured",NA
+"682","29TB-D15-017","Cured","Cured","Cured",NA
+"683","29TB-D15-018","Cured","Cured","Cured",NA
+"684","29TB-D15-019","Cured","Cured","Cured",NA
+"685","29TB-D15-020","Cured","Cured","Cured",NA
+"686","29TB-D15-021","Cured","Cured","Cured",NA
+"687","29TB-D15-022","Cured","Cured","Cured",NA
+"688","29TB-D15-023","Cured","Cured","Cured",NA
+"689","29TB-D15-024","Cured","Cured","Cured",NA
+"690","29TB-D15-025","Cured","Cured","Cured",NA
+"691","29TB-D15-026","Cured","Cured","Cured",NA
+"692","29TB-D15-027","Cured","Treatment Completed","Treatment Completed",NA
+"693","29TB-D15-028","Cured","Treatment Completed","Treatment Completed",NA
+"694","29TB-D15-029","Cured","Cured","Cured",NA
+"695","29TB-D15-030","Cured","Treatment Completed","Treatment Completed",NA
+"696","29TB-D15-031","LOSTFU","LOSTFU","LOSTFU",NA
+"697","29TB-D15-032","Cured","Treatment Completed","Treatment Completed",NA
+"698","29TB-D15-033","Cured","Cured","Cured",NA
+"699","29TB-D15-034","Cured","Cured","Cured",NA
+"700","29TB-D15-035","Cured","Cured","Cured",NA
+"701","29TB-D15-036","LOSTFU","LOSTFU","LOSTFU",NA
+"702","29TB-D15-037","Cured","Treatment Completed","Treatment Completed",NA
+"703","29TB-D15-038","Cured","Treatment Completed","Treatment Completed",NA
+"704","29TB-D15-039","Cured","Cured","Cured",NA
+"705","29TB-D15-040","Cured","Cured","Cured",NA
+"706","29TB-D15-041","Cured","Cured","Cured",NA
+"707","29TB-D15-042","Cured","Cured","Cured",NA
+"708","29TB-D15-043","Cured","Failed","Failed",NA
+"709","29TB-D15-044","Cured","Cured","Cured",NA
+"710","29TB-D18-001","Died","Died","Died",NA
+"711","29TB-D18-002","Cured","Cured","Cured",NA
+"712","29TB-D18-003","Cured","Cured","Cured",NA
+"713","29TB-D18-004","Cured","Treatment Completed","Treatment Completed",NA
+"714","29TB-D18-005","Cured","Cured","Cured",NA
+"715","29TB-D18-006","Cured","Cured","Cured",NA
+"716","29TB-D18-007","Cured","Cured","Cured",NA
+"717","29TB-D18-008","Cured","Cured","Cured",NA
+"718","29TB-D18-009","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"719","29TB-D18-010","Cured","Failed","Failed",NA
+"720","29TB-D18-011","Cured","Failed","Failed",NA
+"721","29TB-D18-012","Cured","Cured","Cured",NA
+"722","29TB-D18-013","LOSTFU","LOSTFU","LOSTFU",NA
+"723","29TB-D18-014","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"724","29TB-D18-015","Cured","Treatment Completed","Treatment Completed",NA
+"725","29TB-D18-016","Cured","Cured","Cured",NA
+"726","29TB-D18-017","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"727","29TB-D18-018","Cured","Cured","Cured",NA
+"728","29TB-D18-019","Cured","Failed","Failed",NA
+"729","29TB-D18-020","Cured","Cured","Cured",NA
+"730","29TB-D18-021","Cured","Treatment Completed","Treatment Completed",NA
+"731","29TB-D18-022","Cured","Treatment Completed","Treatment Completed",NA
+"732","29TB-D18-023","Cured","Cured","Cured",NA
+"733","29TB-D18-024","Cured","Treatment Completed","Treatment Completed",NA
+"734","29TB-D18-025","Cured","Treatment Completed","Treatment Completed",NA
+"735","29TB-D18-026","Cured","Cured","Cured",NA
+"736","29TB-D18-027","Cured","Treatment Completed","Treatment Completed",NA
+"737","29TB-D18-028","Cured","Cured","Cured",NA
+"738","29TB-D18-029","Cured","Cured","Cured",NA
+"739","29TB-D18-030","Cured","Cured","Cured",NA
+"740","29TB-D18-031","Cured","Cured","Cured",NA
+"741","29TB-D18-032","LOSTFU","LOSTFU","LOSTFU",NA
+"742","29TB-D18-033","Cured","Failed","Failed",NA
+"743","29TB-D18-034","Cured","Cured","Cured",NA
+"744","29TB-D18-035","Cured","Failed","Failed",NA
+"745","29TB-D18-036","Cured","Cured","Cured",NA
+"746","29TB-D18-037","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"747","29TB-D18-038","Cured","Treatment Completed","Treatment Completed",NA
+"748","29TB-D18-039","Cured","Cured","Cured",NA
+"749","29TB-D18-040","LOSTFU","LOSTFU","LOSTFU",NA
+"750","29TB-D18-041","Cured","Cured","Cured",NA
+"751","29TB-D18-042","Cured","Failed","Failed",NA
+"752","29TB-D18-043","Cured","Failed","Failed",NA
+"753","29TB-D18-044","Cured","Cured","Cured",NA
+"754","29TB-D18-045","Cured","Failed","Failed",NA
+"755","29TB-D18-046","Cured","Cured","Cured",NA
+"756","29TB-D18-047","Cured","Cured","Cured",NA
+"757","29TB-D18-048","Cured","Cured","Cured",NA
+"758","29TB-D18-049","Cured","Failed","Failed",NA
+"759","29TB-D18-050","Cured","Failed","Failed",NA
+"760","29TB-D18-051","Cured","Cured","Cured",NA
+"761","29TB-D18-052","Cured","Treatment Completed","Treatment Completed",NA
+"762","29TB-D18-053","Cured","Cured","Cured",NA
+"763","29TB-D18-054","Cured","Cured","Cured",NA
+"764","29TB-D18-055","Cured","Treatment Completed","Treatment Completed",NA
+"765","29TB-D18-056","Cured","Cured","Cured",NA
+"766","29TB-D18-057","Cured","Cured","Cured",NA
+"767","29TB-D18-058","Cured","Cured","Cured",NA
+"768","29TB-D18-059","Cured","Cured","Cured",NA
+"769","29TB-D18-060","Cured","Cured","Cured",NA
+"770","29TB-D18-061","Cured","Treatment Completed","Treatment Completed",NA
+"771","29TB-D18-062","Cured","Treatment Completed","Treatment Completed",NA
+"772","29TB-D18-064","Cured","Cured","Cured",NA
+"773","29TB-D18-065","Cured","Cured","Cured",NA
+"774","29TB-D18-066","Cured","Cured","Cured",NA
+"775","29TB-D18-067","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"776","29TB-D18-068","Cured","Treatment Completed","Treatment Completed",NA
+"777","29TB-D18-069","Cured","Failed","Failed",NA
+"778","29TB-D18-070","Cured","Treatment Completed","Treatment Completed",NA
+"779","29TB-D18-071","Cured","Treatment Completed","Treatment Completed",NA
+"780","29TB-D18-072","Cured","Cured","Cured",NA
+"781","29TB-D18-073","Cured","Failed","Failed",NA
+"782","29TB-D18-074","Cured","Cured","Cured",NA
+"783","29TB-D18-075","Cured","Cured","Cured",NA
+"784","29TB-D18-076","Cured","Cured","Cured",NA
+"785","29TB-D18-077","Cured","Failed","Failed",NA
+"786","29TB-D18-078","Cured","Treatment Completed","Treatment Completed",NA
+"787","29TB-D18-079","Cured","Cured","Cured",NA
+"788","29TB-D18-080","Cured","Treatment Completed","Treatment Completed",NA
+"789","29TB-D18-081","Cured","Cured","Cured",NA
+"790","29TB-D18-082","Cured","Cured","Cured",NA
+"791","29TB-D18-083","Cured","Cured","Cured",NA
+"792","29TB-D18-084","Cured","Cured","Cured",NA
+"793","29TB-D18-085","Cured","Cured","Cured",NA
+"794","29TB-D18-086","Cured","Treatment Completed","Treatment Completed",NA
+"795","29TB-D18-087","Cured","Cured","Cured",NA
+"796","29TB-D18-088","Cured","Cured","Cured",NA
+"797","29TB-D18-089","Cured","Cured","Cured",NA
+"798","29TB-D18-090","Cured","Cured","Cured",NA
+"799","29TB-D18-091","Cured","Cured","Cured",NA
+"800","29TB-D18-092","LOSTFU","LOSTFU","LOSTFU",NA
+"801","29TB-D18-093","Cured","Cured","Cured",NA
+"802","29TB-D18-094","Cured","Cured","Cured",NA
+"803","29TB-D18-095","Cured","Cured","Cured",NA
+"804","29TB-D18-096","Cured","Cured","Cured",NA
+"805","29TB-D18-097","Cured","Cured","Cured",NA
+"806","29TB-D18-098","Cured","Cured","Cured",NA
+"807","29TB-D18-099","Cured","Cured","Cured",NA
+"808","29TB-D18-100","Cured","Cured","Cured",NA
+"809","29TB-D18-101","Cured","Cured","Cured",NA
+"810","29TB-D18-102","Cured","Cured","Cured",NA
+"811","29TB-D18-103","Cured","Cured","Cured",NA
+"812","29TB-D18-104","Cured","Failed","Failed",NA
+"813","29TB-D18-105","Cured","Treatment Completed","Treatment Completed",NA
+"814","29TB-D18-106","Cured","Treatment Completed","Treatment Completed",NA
+"815","29TB-D18-107","Cured","Cured","Cured",NA
+"816","29TB-D18-108","Cured","Cured","Cured",NA
+"817","29TB-D18-109","Cured","Cured","Cured",NA
+"818","29TB-D18-110","LOSTFU","LOSTFU","LOSTFU",NA
+"819","29TB-D18-111","Cured","Treatment Completed","Treatment Completed",NA
+"820","29TB-D18-112","Cured","Failed","Failed",NA
+"821","29TB-D18-113","Cured","Failed","Failed",NA
+"822","29TB-D18-114","Cured","Cured","Cured",NA
+"823","29TB-D18-115","Cured","Cured","Cured",NA
+"824","29TB-D18-116","Cured","Cured","Cured",NA
+"825","29TB-D18-117","Cured","Failed","Failed",NA
+"826","29TB-D18-118","Cured","Cured","Cured",NA
+"827","29TB-D18-119","Cured","Cured","Cured",NA
+"828","29TB-D18-120","Cured","Cured","Cured",NA
+"829","29TB-D18-121","Cured","Cured","Cured",NA
+"830","29TB-D18-122","Cured","Failed","Failed",NA
+"831","29TB-D18-123","Cured","Failed","Failed",NA
+"832","29TB-D18-124","Cured","Cured","Cured",NA
+"833","29TB-D18-125","Cured","Cured","Cured",NA
+"834","29TB-D18-126","Cured","Cured","Cured",NA
+"835","29TB-D18-127","Not Evaluated","Not Evaluated","Not Evaluated","Not Evaluated"
+"836","29TB-D18-128","Cured","Cured","Cured",NA
+"837","29TB-D18-129","LOSTFU","LOSTFU","LOSTFU",NA
+"838","29TB-D18-130","Cured","Cured","Cured",NA
+"839","29TB-D18-131","Cured","Cured","Cured",NA
+"840","29TB-D18-132","Cured","Treatment Completed","Treatment Completed",NA
+"841","29TB-D18-133","Cured","Cured","Cured",NA
+"842","29TB-D18-134","Cured","Cured","Cured",NA
+"843","29TB-D18-135","Cured","Cured","Cured",NA
+"844","29TB-D18-136","Cured","Treatment Completed","Treatment Completed",NA
+"845","29TB-D18-137","Not Evaluated","Not Evaluated","Not Evaluated","Not Evaluated"
+"846","29TB-D18-138","Cured","Cured","Cured",NA
+"847","29TB-D19-001","Cured","Treatment Completed","Treatment Completed",NA
+"848","29TB-D19-003","Cured","Cured","Cured",NA
+"849","29TB-D19-004","Cured","Cured","Cured",NA
+"850","29TB-D19-005","Cured","Cured","Cured",NA
+"851","29TB-D19-006","Not Evaluated","Not Evaluated","Not Evaluated","Not Evaluated"
+"852","29TB-D19-007","Cured","Treatment Completed","Treatment Completed",NA
+"853","29TB-D19-008","Cured","Cured","Cured",NA
+"854","29TB-D19-009","Cured","Treatment Completed","Treatment Completed",NA
+"855","29TB-D19-010","Cured","Cured","Cured",NA
+"856","29TB-D19-011","Died","Died","Died","Consistantly_neg"
+"857","29TB-D19-012","Cured","Cured","Cured",NA
+"858","29TB-D19-013","Cured","Cured","Cured",NA
+"859","29TB-D19-014","Cured","Cured","Cured",NA
+"860","29TB-D19-015","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"861","29TB-D19-016","Cured","Cured","Cured",NA
+"862","29TB-D19-017","Cured","Cured","Cured",NA
+"863","29TB-D19-018","Cured","Cured","Cured",NA
+"864","29TB-D19-019","Cured","Cured","Cured",NA
+"865","29TB-D19-020","Cured","Failed","Failed",NA
+"866","29TB-D19-021","Cured","Cured","Cured",NA
+"867","29TB-D19-022","Cured","Cured","Cured",NA
+"868","29TB-D19-023","Cured","Treatment Completed","Treatment Completed","Consistantly_neg"
+"869","29TB-D19-024","Cured","Cured","Cured",NA
+"870","29TB-D19-025","Cured","Cured","Cured",NA
+"871","29TB-D19-026","Cured","Treatment Completed","Treatment Completed",NA
+"872","29TB-D19-027","Cured","Treatment Completed","Treatment Completed",NA
+"873","29TB-D19-028","Cured","Cured","Cured",NA
+"874","29TB-D19-029","Cured","Cured","Cured",NA
+"875","29TB-D19-030","Cured","Cured","Cured",NA
+"876","29TB-D19-031","Cured","Treatment Completed","Treatment Completed",NA
+"877","29TB-D19-032","Cured","Cured","Cured",NA
+"878","29TB-D19-033","Cured","Cured","Cured",NA
+"879","29TB-D19-034","Cured","Treatment Completed","Treatment Completed",NA
+"880","29TB-D19-035","Cured","Cured","Cured",NA
+"881","29TB-D19-036","Cured","Treatment Completed","Treatment Completed",NA
+"882","29TB-D19-037","Cured","Treatment Completed","Treatment Completed",NA
+"883","29TB-D19-038","Not Evaluated","Not Evaluated","Not Evaluated","Not Evaluated"
+"884","29TB-D19-039","Cured","Cured","Cured",NA
+"885","29TB-D19-040","Cured","Cured","Cured",NA
+"886","29TB-D19-041","Cured","Cured","Cured",NA
+"887","29TB-D19-042","Cured","Cured","Cured",NA
+"888","29TB-D19-043","Cured","Cured","Cured",NA
+"889","29TB-D19-044","Cured","Treatment Completed","Treatment Completed",NA
+"890","29TB-D19-045","Cured","Cured","Cured",NA
+"891","29TB-D19-046","Cured","Cured","Cured",NA
+"892","29TB-D19-047","Cured","Cured","Cured",NA
+"893","29TB-D19-048","Cured","Failed","Failed",NA
+"894","29TB-D19-049","Cured","Cured","Cured",NA
+"895","29TB-D19-050","Cured","Cured","Cured",NA
+"896","29TB-D19-051","Cured","Cured","Cured",NA
+"897","29TB-D19-052","LOSTFU","LOSTFU","LOSTFU",NA
+"898","29TB-D19-053","Cured","Cured","Cured",NA
+"899","29TB-D19-054","Failed","Cured","Cured",NA
+"900","29TB-D19-055","Cured","Cured","Cured",NA
+"901","29TB-D20-001","Cured","Failed","Failed",NA
+"902","29TB-D20-002","Cured","Treatment Completed","Treatment Completed",NA
+"903","29TB-D20-003","Cured","Treatment Completed","Treatment Completed",NA
+"904","29TB-D20-004","Cured","Treatment Completed","Treatment Completed",NA
+"905","29TB-D20-005","Cured","Cured","Cured",NA
+"906","29TB-D20-006","Cured","Failed","Failed",NA
+"907","29TB-D20-007","Failed","Treatment Completed","Treatment Completed",NA
+"908","29TB-D21-001","Cured","Cured","Cured",NA
+"909","29TB-D21-002","LOSTFU","LOSTFU","LOSTFU","Consistantly_neg"
+"910","29TB-D21-003","Cured","Cured","Cured",NA
+"911","29TB-D21-004","Cured","Cured","Cured",NA
+"912","29TB-D21-005","Cured","Failed","Failed",NA

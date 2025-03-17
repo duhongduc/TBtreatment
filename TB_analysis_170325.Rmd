@@ -1,0 +1,3522 @@
+---
+title: "TB treatment"
+author: "Duc Du"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+#.libPaths( c( .libPaths(), "C:/Program Files/R/R-devel/library") )
+rm(list = ls(all.names = TRUE))
+knitr::opts_chunk$set(echo = FALSE, 
+                      cache=TRUE,
+                      tidy.opts=list(width.cutoff=60),
+                      tidy=TRUE)
+options(repos = getOption("repos")["CRAN"])
+
+options(scipen=999, digits = 3)
+
+## Required R packages  
+#install.packages("installr") # install installr
+library(installr) #load
+
+#install.packages(c("knitr", "rmarkdown", "markdown"))
+
+library(knitr)
+library(rmarkdown)
+library(markdown)
+
+library(stringr)
+library(forcats)
+library(RColorBrewer)
+library(tidyverse)
+library(dplyr)
+library(readxl)
+library(writexl)
+library(ggplot2)
+library(Hmisc)
+library(gtsummary)
+library(flextable)
+library(huxtable)
+
+
+library(readxl)
+library(data.table)
+library(lubridate)
+library(stringi)
+
+library(psych) # for describing the data
+library(tableone)
+library(compareGroups)
+library(forcats)
+library(ggpubr)
+library(rstatix)
+
+library(lme4)
+library(MASS)
+# install.packages("remotes") # if not already installed
+# remotes::install_github("https://github.com/StatsGary/ConfusionTableR")
+library(ConfusionTableR)
+#install.packages("dlookr")
+library(dlookr)
+library(flextable)
+
+select<-dplyr::select
+recode<-dplyr::recode
+flextable<-flextable::flextable
+```
+
+# Load data
+
+```{r load_data, message=FALSE, warning=FALSE, results='hide'}
+# raw <- read.csv("datafull_28Mar22.csv", header = TRUE)
+# raw <- read.csv("datafull_5Apr23.csv", header = TRUE)
+raw <- read.csv("data/datafull_10_Oct_2023.v2.csv", header = TRUE)
+
+### remove duplication
+raw <- unique(raw, by = c("studycode"))
+
+## remove accent
+#colnames(death_raw) <- stri_trans_general(colnames(death_raw), "Latin-ASCII")
+  
+### rename
+
+## remove accent
+#death_raw$province <- stri_trans_general(death_raw$province, "Latin-ASCII")
+  
+### format date
+raw$date.N0 <- mdy(raw$date.N0)
+raw$date.N14 <- mdy(raw$date.N14)
+raw$date.T01 <- mdy(raw$date.T01)
+raw$date.T02 <- mdy(raw$date.T02)
+raw$date.T03 <- mdy(raw$date.T03)
+raw$date.T04 <- mdy(raw$date.T04)
+raw$date.T05 <- mdy(raw$date.T05)
+raw$date.T06 <- mdy(raw$date.T06)
+raw$date.T07 <- mdy(raw$date.T07)
+raw$date.T08 <- mdy(raw$date.T08)
+raw$date.T09 <- mdy(raw$date.T09)
+raw$date.T10 <- mdy(raw$date.T10)
+raw$date.T11 <- mdy(raw$date.T11)
+raw$date.T12 <- mdy(raw$date.T12)
+raw$date.T13 <- mdy(raw$date.T13)
+raw$date.T14 <- mdy(raw$date.T14)
+raw$date.T15 <- mdy(raw$date.T15)
+raw$date.T16 <- mdy(raw$date.T16)
+raw$date.T17 <- mdy(raw$date.T17)
+raw$date.T18 <- mdy(raw$date.T18)
+raw$date.T19 <- mdy(raw$date.T19)
+raw$date.T20 <- mdy(raw$date.T20)
+raw$date.T21 <- mdy(raw$date.T21)
+raw$date.T22 <- mdy(raw$date.T22)
+raw$date.T23 <- mdy(raw$date.T23)
+raw$date.T24 <- mdy(raw$date.T24)
+
+raw$DateComplete <- mdy(raw$DateComplete)
+raw$DateLastASS <- mdy(raw$DateLastASS)
+raw$DateLastALIVE <- mdy(raw$DateLastALIVE)
+raw$DateDeath <- mdy(raw$DateDeath)
+raw$DateLastFU <- mdy(raw$DateLastFU)
+raw$EnrolledDAT <- mdy(raw$EnrolledDAT)
+```
+
+```{r, results='hide'}
+diagnose(raw) %>% flextable::flextable()
+```
+
+```{r}
+raw[raw == ''] <- NA
+dat <- as.data.frame(raw) %>%
+  mutate(age=as.numeric(DiagnosisAge),
+         age=structure(age, label="Age"),
+         gender=recode(Gender, "M"=1, "F"=2),
+         gender=factor(gender, levels = c(1,2), labels = c("Male", "Female")),
+         occupation=factor(Occupation, labels = c("Employed", "Housewife", "OTHJOB", "Retired", "Student", "Unemployed"), exclude = ""),
+         DUR=as.numeric(DUR),
+         TEMP=as.numeric(TEMP),
+         SYSBP=as.numeric(SYSBP),
+         DIABP=as.numeric(DIABP),
+         Weight=as.numeric(Weight),
+         Height=as.numeric(Height),
+         Weightloss=factor(Weightloss, labels = c("No", "Yes")),
+         WLossDur=as.numeric(WLossDur),
+         NightSweats=factor(NightSweats, labels = c("No", "Yes")),
+         NightSweatsDur=as.numeric(NightSweatsDur),
+         LowFever=factor(LowFever, labels = c("No", "Yes")),
+         LowFeverDur=as.numeric(LowFeverDur),
+         Cough=factor(Cough, labels = c("No", "Yes")),
+         CoughDur=as.numeric(CoughDur),
+         Sputum=factor(Sputum, labels = c("No", "Yes")),
+         SputumDur=as.numeric(SputumDur),
+         Haemoptysis=factor(Haemoptysis, labels = c("No", "Yes")),
+         HaemoptysisDur=as.numeric(HaemoptysisDur),
+         ChestPain=factor(ChestPain, labels = c("No", "Yes")),
+         ChestPainDur=as.numeric(ChestPainDur),
+         Malaise=factor(Malaise, labels = c("No", "Yes")),
+         MalaiseDur=as.numeric(MalaiseDur),
+         Dyspnea=factor(Dyspnea, labels = c("No", "Yes")),
+         DyspneaDur=as.numeric(DyspneaDur),
+         TBcontact=factor(TBcontact, labels = c("No", "Yes")),
+         Household=factor(Household, labels = c("No", "Yes")),
+         Working=factor(Working, labels = c("No", "Yes")),
+         Neighbor=factor(Neighbor, labels = c("No", "Yes")),
+         TBTreatedBefore=factor(TBTreatedBefore, labels = c("No", "Yes")),
+         TBType=factor(TBType, labels = c("AFBMinus", "AFBPlus", "ExtrapulmonaryTB", "Unknown")),
+         TBTreatmentNum=as.numeric(TBTreatmentNum),
+         BCGVaccinated=factor(BCGVaccinated, labels = c("No", "Yes")),
+         PatientHIV=factor(PatientHIV, labels = c("Negative", "Positive")),
+         HIVYears=as.numeric(HIVYears),
+         ARTSTDATUNK=as.logical(ARTSTDATUNK),
+         CoTrimoxazole=factor(CoTrimoxazole, labels = c("No", "Yes")),
+         IntravenousDrugs=factor(IntravenousDrugs, labels = c("No", "Yes")),
+         Diabetes=factor(Diabetes, labels = c("No", "Yes")),
+         DiabetesYears=as.numeric(DiabetesYears),
+         Insulin=factor(Insulin, labels = c("No", "Yes")),
+         Metformin=factor(Metformin, labels = c("No", "Yes")),
+         Smoking=factor(Smoking, labels = c("Ex-Smoker", "Never", "Occasional", "Regular")),
+         PackPerDay=as.numeric(PackPerDay),
+         SmokingYears=as.numeric(SmokingYears),
+         Over15AlcoholUnits=factor(Over15AlcoholUnits, labels = c("No", "Yes")),
+         PLAT=as.numeric(PLAT),
+         genotype=factor(genotype, labels = c("CC", "TC", "TT")),
+         D3=as.numeric(D3),
+         Total=as.numeric(Total),
+         study=factor(study, labels = c("28TB", "29TB")),
+         InitialDiagnosis=factor(InitialDiagnosis, labels = c("DST", "GeneXpert", "Hain")),
+         MDR_TB=factor(MDR_TB, labels = c("New", "Regimen1Failure", "Regimen2Failure", "Relapse", "ReTreatment")),
+         DM=factor(DM, labels = c("Diabetes", "No diabetes", "Prediabetes")),
+         GenXpert=factor(GenXpert, labels = c("MTB Detected High", "MTB Detected Low", "MTB Detected Medium", "Detected Very Low", "MTB Not Detected")),
+         Cavity=factor(Cavity, labels = c("No", "Yes")),
+         DM1=factor(DM1, labels = c("Diabetes", "No diabetes")),
+         bmigroup=factor(bmigroup, labels = c("Normal", "Obese", "Overweight", "Severe underweight", "Underweight")),
+         agegroup=factor(agegroup, labels = c(">65", "30-40", "40-65", "<30")),
+         phylo_group=factor(phylo_group, labels = c("Mycobacterium_tuberculosis_complex", "Mycobacterium_tuberculosis_complex, Non_tuberculosis_mycobacterium_complex", "Non_tuberculosis_mycobacterium_complex", "Unknown")),
+         species=factor(species, labels = c("Mycobacterium_abscessus", "Mycobacterium_avium", "Mycobacterium_brisbanense", "Mycobacterium_farcinogenes", "Mycobacterium_fortuitum", "Mycobacterium_gordonae", "Mycobacterium_intracellulare", "Mycobacterium_novum", "Mycobacterium_tuberculosis", "Mycobacterium_tuberculosis, Mycobacterium_abscessus", "Mycobacterium_tuberculosis, Mycobacterium_avium", "Mycobacterium_tuberculosis, Mycobacterium_brisbanense", "Mycobacterium_tuberculosis, Mycobacterium_colombiense", "Mycobacterium_tuberculosis, Mycobacterium_farcinogenes", "Mycobacterium_tuberculosis, Mycobacterium_fortuitum", "Mycobacterium_tuberculosis, Mycobacterium_intracellulare", "Mycobacterium_tuberculosis, Mycobacterium_mantenii", "Mycobacterium_tuberculosis, Mycobacterium_novum", "Mycobacterium_tuberculosis, Mycobacterium_parascrofulaceum", "Unknown")),
+         lineage = factor(lineage, labels = c("Beijing_East_Asia", "Beijing_East_Asia,Mycobacterium_abscessus_subsp_bolletii", "Beijing_East_Asia,Mycobacterium_avium_subsp_avium", "Delhi_Central_Asia", "East_Africa_Indian_ocean", "East_Africa_Indian_ocean,Mycobacterium_avium_subsp_avium", "East_Africa_Indian_ocean, Mycobacterium_abscessus_subsp_bolletii", "European_American", "Mycobacterium_abscessus_subsp_bolletii", "Mycobacterium_avium_subsp_avium", "Unknown")),
+         Amikacin = na_if(Amikacin, "#N/A"),
+         Amikacin = factor(Amikacin, labels = c("R", "S")),
+         Capreomycin = na_if(Capreomycin, "#N/A"),
+         Capreomycin = factor(Capreomycin, labels = c("R", "R", "S")),
+         Ciprofloxacin = na_if(Ciprofloxacin, "#N/A"),
+         Ciprofloxacin = factor(Ciprofloxacin, labels = c("R", "R", "S")),
+         Ethambutol = na_if(Ethambutol, "#N/A"),
+         Ethambutol = factor(Ethambutol, labels = c("R", "R", "S")),
+         Kanamycin = na_if(Kanamycin, "#N/A"),
+         Kanamycin = factor(Kanamycin, labels = c("R", "S")),
+         Moxifloxacin = na_if(Moxifloxacin, "#N/A"),
+         Moxifloxacin = factor(Moxifloxacin, labels = c("R", "R", "S")),
+         Ofloxacin = na_if(Ofloxacin, "#N/A"),
+         Ofloxacin = factor(Ofloxacin, labels = c("R", "R", "S")),
+         Pyrazinamide = na_if(Pyrazinamide, "#N/A"),
+         Pyrazinamide = factor(Pyrazinamide, labels = c("R", "R", "S")),
+         Rifampicin = na_if(Rifampicin, "#N/A"),
+         Rifampicin = factor(Rifampicin, labels = c("R", "R", "S")),
+         Streptomycin = na_if(Streptomycin, "#N/A"),
+         Streptomycin = factor(Streptomycin, labels = c("R", "R", "S")),
+         Drug_WGS_sum = factor(Drug_WGS_sum, labels = c("H_mono", "MDR", "other", "Pre_XDR_F", "Pre_XDR_I", "R_mono", "SEN", "XDR")),
+         TNF=as.numeric(TNF),
+         IL6=as.numeric(IL6),
+         IL10=as.numeric(IL10),
+         IL1b=as.numeric(IL1b),
+         IFN=as.numeric(IFN),
+         IL2=as.numeric(IL2),
+         IL13=as.numeric(IL13),
+         IL12p70=as.numeric(IL12p70),
+         Weight.T07=as.numeric(Weight.T07),
+         Weight.T08=as.numeric(Weight.T08),
+         Weight.T10=as.numeric(Weight.T10),
+         Weight.T11=as.numeric(Weight.T11),
+         Weight.T12=as.numeric(Weight.T12),
+         Weight.T13=as.numeric(Weight.T13),
+         Weight.T14=as.numeric(Weight.T14),
+         Weight.T15=as.numeric(Weight.T15),
+         Weight.T16=as.numeric(Weight.T16),
+         Weight.T17=as.numeric(Weight.T17),
+         Weight.T18=as.numeric(Weight.T18),
+         Weight.T20=as.numeric(Weight.T20),
+         Weight.T24=as.numeric(Weight.T24),
+         cough.N14=factor(cough.N14, labels = c("No", "Yes")),
+         cough.T01=factor(cough.T01, labels = c("No", "Yes")),
+         cough.T02=factor(cough.T02, labels = c("No", "Yes")),
+         cough.T03=factor(cough.T03, labels = c("No", "Yes")),
+         cough.T04=factor(cough.T04, labels = c("No", "Yes")),
+         cough.T05=factor(cough.T05, labels = c("No", "Yes")),
+         cough.T06=factor(cough.T06, labels = c("No", "Yes")),
+         cough.T07=factor(cough.T07, labels = c("No", "Yes")),
+         cough.T08=factor(cough.T08, labels = c("No", "Yes")),
+         cough.T09=factor(cough.T09, labels = c("No", "Yes")),
+         cough.T10=factor(cough.T10, labels = c("No", "Yes")),
+         cough.T11=factor(cough.T11, labels = c("No", "Yes")),
+         cough.T12=factor(cough.T12, labels = c("No", "Yes")),
+         cough.T13=factor(cough.T13, labels = c("No", "Yes")),
+         cough.T14=factor(cough.T14, labels = c("No", "Yes")),
+         cough.T15=factor(cough.T15, labels = c("No", "Yes")),
+         cough.T16=factor(cough.T16, labels = c("No", "Yes")),
+         cough.T17=factor(cough.T17, labels = c("No", "Yes")),
+         cough.T18=factor(cough.T18, labels = c("No")),
+         cough.T20=factor(cough.T20, labels = c("No")),
+         cough.T24=factor(cough.T24, labels = c("No")),
+         LowFever.N14=factor(LowFever.N14, labels = c("No", "Yes")),
+         LowFever.T01=factor(LowFever.T01, labels = c("No", "Yes")),
+         LowFever.T02=factor(LowFever.T02, labels = c("No", "Yes")),
+         LowFever.T03=factor(LowFever.T03, labels = c("No", "Yes")),
+         LowFever.T04=factor(LowFever.T04, labels = c("No", "Yes")),
+         LowFever.T05=factor(LowFever.T05, labels = c("No", "Yes")),
+         LowFever.T06=factor(LowFever.T06, labels = c("No", "Yes")),
+         LowFever.T07=factor(LowFever.T07, labels = c("No", "Yes")),
+         LowFever.T08=factor(LowFever.T08, labels = c("No", "Yes")),
+         LowFever.T09=factor(LowFever.T09, labels = c("No", "Yes")),
+         LowFever.T10=factor(LowFever.T10, labels = c("No")),
+         LowFever.T11=factor(LowFever.T11, labels = c("No")),
+         LowFever.T12=factor(LowFever.T12, labels = c("No", "Yes")),
+         LowFever.T13=factor(LowFever.T13, labels = c("No")),
+         LowFever.T14=factor(LowFever.T14, labels = c("No")),
+         LowFever.T15=factor(LowFever.T15, labels = c("No")),
+         LowFever.T16=factor(LowFever.T16, labels = c("No")),
+         LowFever.T17=factor(LowFever.T17, labels = c("No")),
+         LowFever.T18=factor(LowFever.T18, labels = c("No")),
+         LowFever.T20=factor(LowFever.T20, labels = c("No")),
+         LowFever.T24=factor(LowFever.T24, labels = c("No")),
+         Xpert_2=factor(Xpert_2, labels = c("High", "Low")),
+         anemia=factor(anemia, labels = c("Anemia", "Normal")),
+         met=factor(met, labels = c("Diabetes", "No diabetes", "Prediabetes", "Unknown")),
+         TS=factor(TS, labels = c("High", "Low")),
+         culture=factor(culture, labels = c("No", "Yes")),
+         alcohol=factor(alcohol, labels = c("No", "Yes")),
+         mort=factor(mort, labels = c("Died", "Alive")),
+         drug1=factor(drug1, labels = c("MDR", "other", "Pre_XDR_F", "Pre_XDR_I", "SEN", "XDR")),
+         symptom_severity=factor(symptom_severity, labels = c("Mild", "severe")),
+         clini_severity=factor(clini_severity, labels = c("Mild", "severe")),
+         Regimen=factor(Regimen, labels = c("20M", "6M", "8M", "9M")),
+         OUT=factor(OUT, labels = c("Cured", "Died", "Failed", "LOSTFU", "Not Evaluated", "Treatment Completed")),
+         Culture.N0=factor(Culture.N0, labels = c("Negative", "No sputum", "Positive")),
+         Culture.N14=factor(Culture.N14, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T01=factor(Culture.T01, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T02=factor(Culture.T02, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T03=factor(Culture.T03, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T04=factor(Culture.T04, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T05=factor(Culture.T05, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T06=factor(Culture.T06, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T07=factor(Culture.T07, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T08=factor(Culture.T08, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T09=factor(Culture.T09, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T10=factor(Culture.T10, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T11=factor(Culture.T11, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T12=factor(Culture.T12, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T13=factor(Culture.T13, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T14=factor(Culture.T14, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T15=factor(Culture.T15, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T16=factor(Culture.T16, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T17=factor(Culture.T17, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T18=factor(Culture.T18, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T20=factor(Culture.T20, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T21=factor(Culture.T21, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T22=factor(Culture.T22, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T23=factor(Culture.T23, labels = c("Negative", "No sputum", "Positive")),
+         Culture.T24=factor(Culture.T24, labels = c("Negative", "No sputum", "Positive")),
+         Last_Culture_conversion=factor(Last_Culture_conversion, labels = c("censor", "Culture.N14", "Culture.T01", "Culture.T02", "Culture.T03", "Culture.T04", "Culture.T05", "Culture.T06", "Culture.T07", "Culture.T08", "Culture.T09", "Culture.T10", "Culture.T11", "Culture.T13", "Culture.T14", "Culture.T15", "Culture.T16", "Culture.T17", "Culture.T18")),
+         last_time_convert=as.numeric(last_time_convert),
+         Culture_conversion=factor(Culture_conversion, labels = c("censor", "Culture.N14", "Culture.T01", "Culture.T02", "Culture.T03", "Culture.T04", "Culture.T05", "Culture.T06", "Culture.T07", "Culture.T08")),
+         Time=as.numeric(Time),
+         follow_up_timepoint=factor(follow_up_timepoint, labels = c("Culture.N0", "Culture.N14", "Culture.T01", "Culture.T02", "Culture.T03", "Culture.T04", "Culture.T05", "Culture.T06", "Culture.T07", "Culture.T08", "Culture.T09", "Culture.T10", "Culture.T11", "Culture.T12", "Culture.T13", "Culture.T14", "Culture.T15", "Culture.T16", "Culture.T17", "Culture.T18", "Culture.T19", "Culture.T20", "Culture.T22", "Culture.T23", "non-stop")),
+         reversion=factor(reversion, labels = c("censor", "Culture.T01", "Culture.T02", "Culture.T03", "Culture.T04", "Culture.T05", "Culture.T06", "Culture.T07", "Culture.T08", "Culture.T09", "Culture.T10", "Culture.T11", "Culture.T12", "Culture.T13", "Culture.T14", "Culture.T15", "Culture.T16", "Culture.T17", "Culture.T24", "No")),
+         reversion_date=as.numeric(reversion_date))
+```
+
+```{r}
+#Outcome
+# dat$outcome<-NA
+#  
+# dat$outcome[dat$Regimen=="6M"&dat$Last_Culture_conversion%in%c("Culture.N14", "Culture.T01", "Culture.T02", "Culture.T03", "Culture.T04", "Culture.T05")&dat$Culture.T06=="Negative"]<-"Cured"
+#  
+# dat$outcome[dat$Regimen=="6M"&dat$Last_Culture_conversion%in%c("Culture.N14", "Culture.T01", "Culture.T02", "Culture.T03", "Culture.T04", "Culture.T05")&dat$Culture.T06=="Negative"&!(dat$reversion=="No")]<-"Cured"
+# dat$outcome[dat$Regimen=="8M"&dat$Last_Culture_conversion%in%c("Culture.N14", "Culture.T01", "Culture.T02", "Culture.T03", "Culture.T04", "Culture.T05","Culture.T06", "Culture.T07" )&(dat$Culture.T08=="Negative"|dat$Culture.T07=="Negative")&dat$reversion=="No"]<-"Cured"
+#  
+# dat$outcome[dat$Regimen=="6M"&dat$outcome=="Cured"&dat$Culture.T05=="no sputum"&dat$Culture.T04=="Positive"]<-"Completed"
+# dat$outcome[dat$Regimen=="8M"&dat$outcome=="Cured"&dat$Culture.T07=="no sputum"&dat$Culture.T06=="Positive"]<-"Completed"
+#  
+# dat$outcome[!dat$OUT%in%c("Failed", "Died", "LOSTFU")&!dat$outcome%in%c("Cured", "Failed")]<-"Completed"
+# dat$outcome[dat$Culture_conversion=="censor"&dat$Culture.N0=="Negative"&dat$Culture.T05=="Negative"&dat$Culture.T06=="Negative"&dat$Regimen=="6M"]<-"Cured"
+# dat$outcome[dat$Culture_conversion=="censor"&dat$Culture.N0=="Negative"&dat$Culture.T07=="Negative"&dat$Culture.T08=="Negative"&dat$Regimen=="8M"]<-"Cured"
+#  
+# dat$outcome[dat$Regimen=="6M"&(dat$Culture.T05=="Positive"|dat$Culture.T06=="Positive")]<-"Failed"
+# dat$outcome[dat$Regimen=="8M"&(dat$Culture.T07=="Positive"|dat$Culture.T08=="Positive")]<-"Failed"
+# dat$outcome[dat$studycode=="29TB-D12-102"]<-"Failed" #No follow up sputum to define, but DTU's outcome was "failed"
+# dat$outcome[dat$studycode=="29TB-D13-066"]<-"Failed" #No follow up sputum to define, but DTU's outcome was "failed"
+# dat$outcome[dat$studycode=="29TB-D20-007"]<-"Failed" #No follow up sputum to define, but DTU's outcome was "failed"
+# dat$outcome[dat$studycode=="29TB-D04-012"]<-"Failed" #Check the excel file
+# 
+# dat$outcome[dat$studycode=="28TB-D05-001"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D06-018"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D15-018"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D19-008"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D19-012"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-023"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-030"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-039"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-040"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-046"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-047"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-048"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-081"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-082"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-087"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-100"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-101"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-145"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-159"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-168"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-187"]<-"Failed" #Check the excel file
+# dat$outcome[dat$studycode=="28TB-D25-192"]<-"Failed" #Check the excel file
+# 
+# dat$outcome[dat$OUT=="Died"]<-"Died"
+# dat$outcome[dat$OUT=="LOSTFU"]<-"LOSTFU"
+
+dat2 <- read.csv("data/derived_data_2_outcome_clean_05_03_2024.csv", header = TRUE)
+
+dat <- dat %>% left_join(dat2 %>% select(studycode, Combined_treatment_outcome))
+
+dat$outcome <- dat$Combined_treatment_outcome
+table(dat$outcome)
+
+dat$outcome2<-NA
+dat$outcome2[dat$outcome=="Completed"]<-0
+dat$outcome2[dat$outcome=="Cured"]<-0
+dat$outcome2[dat$outcome=="Died"]<-1
+dat$outcome2[dat$outcome=="Failed"]<-1
+dat$outcome2[dat$outcome=="LOSTFU"]<-2
+dat$outcome2[dat$outcome=="Not Evaluated"]<-2
+dat$outcome2 <- factor(dat$outcome2, levels = c(0,1,2), labels = c("Good outcome", "Bad outcome", "Lost FU"))
+table(dat$outcome2)
+```
+
+```{r}
+dat$EnrolledDAT <- as.Date(dat$EnrolledDAT, format="%Y/%m/%d")
+dat$DateDeath <- as.Date(dat$DateDeath, format="%Y/%m/%d")
+dat$DateComplete <- as.Date(dat$DateComplete, format="%Y/%m/%d")
+dat$DateLastFU <- as.Date(dat$DateLastFU, format="%Y/%m/%d")
+
+# g6 <- dat %>% filter(Regimen=="6M") %>%
+# ggplot(aes(y=studycode)) +
+#   geom_segment(aes(x=EnrolledDAT, xend=DateComplete, yend=studycode), show.legend = T, color="grey") +
+#   geom_point(aes(x=EnrolledDAT, y=studycode, shape="EnrolledDAT", color="EnrolledDAT"), size=1.5) +
+#   geom_point(aes(x=DateDeath, y=studycode, shape="DateDeath", color="DateDeath"), size=1.5) +
+#   geom_point(aes(x=DateComplete, y=studycode, shape="DateComplete", color="DateComplete"), size=1.5) +
+#   geom_point(aes(x=DateLastFU, y=studycode, shape="DateLastFU", color="DateLastFU"), size=1.5) +
+#   geom_vline(xintercept = 0, color = "red") +
+#   scale_x_date("Date", date_breaks = "1 week") +
+#   scale_y_discrete("Cases") +
+#   scale_shape_discrete(name="") +
+#   scale_color_discrete(name="") +
+#   theme_bw() +
+#   theme(legend.key = element_blank(), legend.position = "bottom",
+#         legend.direction = "horizontal",
+#         axis.text.x=element_text(color="black", angle = 90, size=27),
+#         axis.text.y=element_text(size=10),
+#         axis.title.x = element_text(face="bold", colour="black", size=60),
+#         axis.title.y = element_text(face="bold", colour="black", size=60),
+#         axis.ticks.y=element_blank(),
+#         legend.text = element_text(size = 45),
+#         legend.title = element_text(colour="black", size=60)) +
+#   annotate("text", x=as.Date("2020-02-03"), y="29TB-D19-055", label=paste("N", nrow(g6$data), sep = "="), size=20, color="red")
+# png(filename = "Regimen6.png", width = 30, height = 22,res=400,units = "cm")
+# g6
+# dev.off()
+# 
+# g8 <- dat %>% filter(Regimen=="8M") %>%
+# ggplot(aes(y=studycode)) +
+#   geom_segment(aes(x=EnrolledDAT, xend=DateComplete, yend=studycode), show.legend = T, color="grey") +
+#   geom_point(aes(x=EnrolledDAT, y=studycode, shape="EnrolledDAT", color="EnrolledDAT"), size=1.5) +
+#   geom_point(aes(x=DateDeath, y=studycode, shape="DateDeath", color="DateDeath"), size=1.5) +
+#   geom_point(aes(x=DateComplete, y=studycode, shape="DateComplete", color="DateComplete"), size=1.5) +
+#   geom_point(aes(x=DateLastFU, y=studycode, shape="DateLastFU", color="DateLastFU"), size=1.5) +
+#   geom_vline(xintercept = 0, color = "red") +
+#   scale_x_date("Date", date_breaks = "1 week") +
+#   scale_y_discrete("Cases") +
+#   scale_shape_discrete(name="") +
+#   scale_color_discrete(name="") +
+#   theme_bw() +
+#   theme(legend.key = element_blank(), legend.position = "bottom",
+#         legend.direction = "horizontal",
+#         axis.text.x=element_text(color="black", angle = 90, size=27),
+#         axis.text.y=element_text(size=20),
+#         axis.title.x = element_text(face="bold", colour="black", size=60),
+#         axis.title.y = element_text(face="bold", colour="black", size=60),
+#         axis.ticks.y=element_blank(),
+#         legend.text = element_text(size = 45),
+#         legend.title = element_text(colour="black", size=60)) +
+#   annotate("text", x=as.Date("2020-02-03"), y="29TB-D19-015", label=paste("N", nrow(g8$data), sep = "="), size=20, color="red") 
+# png(filename = "Regimen8.png", width = 30, height = 22,res=400,units = "cm")
+# g8
+# dev.off()
+# 
+# g9 <- dat %>% filter(Regimen=="9M") %>%
+# ggplot(aes(y=studycode)) +
+#   geom_segment(aes(x=EnrolledDAT, xend=DateComplete, yend=studycode), show.legend = T, color="grey") +
+#   geom_point(aes(x=EnrolledDAT, y=studycode, shape="EnrolledDAT", color="EnrolledDAT"), size=1.5) +
+#   geom_point(aes(x=DateDeath, y=studycode, shape="DateDeath", color="DateDeath"), size=1.5) +
+#   geom_point(aes(x=DateComplete, y=studycode, shape="DateComplete", color="DateComplete"), size=1.5) +
+#   geom_point(aes(x=DateLastFU, y=studycode, shape="DateLastFU", color="DateLastFU"), size=1.5) +
+#   geom_vline(xintercept = 0, color = "red") +
+#   scale_x_date("Date", date_breaks = "1 week") +
+#   scale_y_discrete("Cases") +
+#   scale_shape_discrete(name="") +
+#   scale_color_discrete(name="") +
+#   theme_bw() +
+#   theme(legend.key = element_blank(), legend.position = "bottom",
+#         legend.direction = "horizontal",
+#         axis.text.x=element_text(color="black", angle = 90, size=27),
+#         axis.text.y=element_text(size=10),
+#         axis.title.x = element_text(face="bold", colour="black", size=60),
+#         axis.title.y = element_text(face="bold", colour="black", size=60),
+#         axis.ticks.y=element_blank(),
+#         legend.text = element_text(size = 45),
+#         legend.title = element_text(colour="black", size=60)) +
+#   annotate("text", x=as.Date("2020-02-03"), y="28TB-D25-175", label=paste("N", nrow(g9$data), sep = "="), size=20, color="red")
+# png(filename = "Regimen9.png", width = 30, height = 22,res=400,units = "cm")
+# g9
+# dev.off()
+# 
+# g20 <- dat %>% filter(Regimen=="20M") %>%
+# ggplot(aes(y=studycode)) +
+#   geom_segment(aes(x=EnrolledDAT, xend=DateComplete, yend=studycode), show.legend = T, color="grey") +
+#   geom_point(aes(x=EnrolledDAT, y=studycode, shape="EnrolledDAT", color="EnrolledDAT"), size=1.5) +
+#   geom_point(aes(x=DateDeath, y=studycode, shape="DateDeath", color="DateDeath"), size=1.5) +
+#   geom_point(aes(x=DateComplete, y=studycode, shape="DateComplete", color="DateComplete"), size=1.5) +
+#   geom_point(aes(x=DateLastFU, y=studycode, shape="DateLastFU", color="DateLastFU"), size=1.5) +
+#   geom_vline(xintercept = 0, color = "red") +
+#   scale_x_date("Date", date_breaks = "1 week") +
+#   scale_y_discrete("Cases") +
+#   scale_shape_discrete(name="") +
+#   scale_color_discrete(name="") +
+#   theme_bw() +
+#   theme(legend.key = element_blank(), legend.position = "bottom",
+#         legend.direction = "horizontal",
+#         axis.text.x=element_text(color="black", angle = 90, size=27),
+#         axis.text.y=element_text(size=20),
+#         axis.title.x = element_text(face="bold", colour="black", size=60),
+#         axis.title.y = element_text(face="bold", colour="black", size=60),
+#         axis.ticks.y=element_blank(),
+#         legend.text = element_text(size = 45),
+#         legend.title = element_text(colour="black", size=60)) +
+#   annotate("text", x=as.Date("2020-02-03"), y="28TB-D25-017", label=paste("N", nrow(g20$data), sep = "="), size=20, color="red")
+# png(filename = "Regimen20.png", width = 30, height = 22,res=400,units = "cm")
+# g20
+# dev.off() 
+```
+
+```{r clean sputum data, results='hide', message=FALSE, warning=FALSE}
+# Clean data
+sputum_clean <- dat %>%
+  dplyr::select(c(studycode, Regimen,
+           DiagnosisAge, Gender, Occupation, DUR, TEMP, SYSBP, DIABP, Weight, Height, TBTreatedBefore, TBType,
+           PreTBSTDAT, PreTBENDAT, BCGVaccinated, PatientHIV, Diabetes, Smoking, Over15AlcoholUnits,
+           Insulin, Metformin, RBC, HGB, WBC, NEUTLE, LYMLE, MONOLE, PLAT, FASTGLUC, HbA1C, ALB, GLO,
+           EnrolledDAT, DateComplete, DateLastASS, DateLastALIVE, DateDeath, DateLastFU, OUT,
+           genotype, D2, D3, MDR_TB, DM, GenXpert, Cavity, Timika.score, bmi, lineage,
+           TNF, IL6, IL10, IL1b, IFN, IL2, IL13, IL12p70, CT_mean, alcohol, mort, symptom_severity, symptom_score, clini_score, clini_severity,
+           Culture.N0, Culture.N14, Culture.T01, Culture.T02, Culture.T03, Culture.T04, Culture.T05, Culture.T06, Culture.T07, Culture.T08, Culture.T09,
+           Culture.T10, Culture.T11, Culture.T12, Culture.T13, Culture.T14, Culture.T15, Culture.T16, Culture.T17, Culture.T18, Culture.T19,
+           Culture.T20, Culture.T21, Culture.T22, Culture.T23, Culture.T24,
+           date.N0, date.N14, date.T01, date.T02, date.T03, date.T04, date.T05, date.T06, date.T07, date.T08, date.T09, 
+           date.T10, date.T11, date.T12, date.T13, date.T14, date.T15, date.T16, date.T17, date.T18, date.T19, 
+           date.T20, date.T21, date.T22, date.T23, date.T24, 
+           Last_Culture_conversion, last_time_convert, Culture_conversion, Time, follow_up_timepoint, reversion, reversion_date,
+           age, gender, occupation, outcome, outcome2))
+
+## Merge culture sputum data with treatment and outcome data
+outcome <- read_excel("data/outcome_28_29TB_Tim.xlsx", col_types = "text")
+outcome <- unique(outcome, by = c("id"))
+sputum_clean <-left_join(outcome %>% dplyr::select(c(studycode, STDAT)), sputum_clean, by="studycode")
+
+## Impute the missing date N0 of 29TB
+#sputum_clean$date.N0[sputum_clean$studycode=="29TB-D06-011"]<-sputum_clean$STDAT[sputum_clean$studycode=="29TB-D06-011"]
+#sputum_clean$date.N0[sputum_clean$studycode=="29TB-D06-012"]<-sputum_clean$STDAT[sputum_clean$studycode=="29TB-D06-012"]
+#sputum_clean$date.N0[sputum_clean$studycode=="29TB-D06-032"]<-sputum_clean$STDAT[sputum_clean$studycode=="29TB-D06-032"]
+#sputum_clean$date.N0[sputum_clean$studycode=="29TB-D12-071"]<-sputum_clean$STDAT[sputum_clean$studycode=="29TB-D12-071"]
+#sputum_clean$date.N0[sputum_clean$studycode=="29TB-D19-011"]<-sputum_clean$STDAT[sputum_clean$studycode=="29TB-D19-011"]
+```
+
+```{r, message=FALSE, warning=FALSE}
+## function for check time to conversion for 28TB at 8M
+### function aims to check index of each timepoint with  tp < 10000 conversion, tp = 10000 no conversion or censor
+### censor means there is no event (conversion) happening during this given period.
+### for 28TB conversion if 2 consecutive negative culture which are at least 1 month apart (calculate until T09 timepoint for both regimen)
+### for 29TB, conversion is negative culture at that timepoint after at least 1 month of treatment. (calculate until T06 for regimen 6M, T08 for 8M )
+TimePointChecker_28TB <-function(pos1, v){
+  tp = 10000
+  pos = pos1
+  stopifnot(pos <= length(v))
+  if(v[[pos]] == 'Negative'){
+    while(pos < length(v)){
+      pos = pos + 1
+      if(v[[pos]] == 'Negative'){
+        tp = pos1
+        break
+      }
+      
+      if(v[[pos]] == 'Positive'){
+        break
+      }
+    }
+  }
+  return(tp)
+}
+
+
+### function 2 return to earliest conversion timepoint
+CheckForIndividual_28TB <- function(v){
+  record = c()
+  for(p in 1:length(v)){
+    temp = TimePointChecker_28TB(p,v)
+    record = c(record,temp)
+  }
+  Index_TP <- min(record)
+  if(Index_TP < 10000) time_point <- colnames(v)[Index_TP]
+  if(Index_TP == 10000) time_point <- "censor"
+  return(time_point)
+
+}
+
+
+## function check time conversion for 29TB
+### function 1 check index of each time point < 10000 conversion, = 10000 no conversion or censor
+TimePointChecker_29TB <-function(pos1, v){
+  tp = 10000
+  pos = pos1
+  stopifnot(pos <= length(v))
+  if(v[[pos]] == 'Negative'){
+    tp = pos1
+  }
+  return(tp)
+}
+
+### function 2 return to earliest conversion timepoint
+CheckForIndividual_29TB <- function(v){
+  record = c()
+  for(p in 1:length(v)){
+    temp = TimePointChecker_29TB(p,v)
+    record = c(record,temp)
+  }
+  Index_TP <- min(record)
+  if(Index_TP < 10000) time_point <- colnames(v)[Index_TP]
+  if(Index_TP == 10000) time_point = "censor"
+  return(time_point)
+}
+
+##### Final function each patient
+##### in this function for 28TB, if the culture for T02 is positive, we will take the input from Culture.T02 to Culture.T09 
+##### in order to avoid cases in which Culture.N14 and CUlture.T01 negative. This is because we require two cultures negative which are apart at least 1 months.
+##### for 29TB we choose the input from Culture.N14 to Culture.T06 or Culture.N14 to Culture.T08 in order to avoid the cases in which
+##### Culture.N0 is Negative and Culture.N14 is positive. Because in this case the function "Timetoconvert" will return the timepoint Culture.N0 and this 
+##### will causes error later.
+
+Timetoconvert <- function(row_data) {
+  Convert_result = NA
+  if (is.na(row_data[["Regimen"]]) | "Positive" %nin% c(row_data[["Culture.N0"]], row_data[["Culture.N14"]])) {
+    Convert_result = NA
+  }
+  else if (substr(row_data[["studycode"]],1,4)=="29TB" & row_data[["Regimen"]]=="6M") {
+    row_data_culture = row_data[which(colnames(row_data)=="Culture.N14"):which(colnames(row_data)=="Culture.T06")]
+    Convert_result = CheckForIndividual_29TB(row_data_culture)
+    }
+  else if (substr(row_data[["studycode"]],1,4)=="29TB" & row_data[["Regimen"]]=="8M") {
+    row_data_culture = row_data[which(colnames(row_data)=="Culture.N14"):which(colnames(row_data)=="Culture.T08")]
+    Convert_result = CheckForIndividual_29TB(row_data_culture)
+    }
+  else if (substr(row_data[["studycode"]],1,4)=="28TB" & row_data[["Regimen"]]=="9M") {
+    row_data_culture = row_data[which(colnames(row_data)=="Culture.N14"):which(colnames(row_data)=="Culture.T09")]
+    if(row_data["Culture.T02"]=="Positive") row_data_culture = row_data[which(colnames(row_data)=="Culture.T02"):which(colnames(row_data)=="Culture.T09")]
+    Convert_result = CheckForIndividual_28TB(row_data_culture)
+    }
+  else if (substr(row_data[["studycode"]],1,4)=="28TB" & row_data[["Regimen"]]=="20M") {
+    row_data_culture = row_data[which(colnames(row_data)=="Culture.N14"):which(colnames(row_data)=="Culture.T09")]
+    if(row_data["Culture.T02"]=="Positive") row_data_culture = row_data[which(colnames(row_data)=="Culture.T02"):which(colnames(row_data)=="Culture.T09")]
+    Convert_result = CheckForIndividual_28TB(row_data_culture)
+    }
+  return(Convert_result)
+}
+
+days_to_convert <- function(convert_time_point,v){
+  if(is.na(convert_time_point)){
+    time = NA
+  }
+  else if (convert_time_point == "censor" & is.na(v[["OUT"]])){
+    time = 600
+  }
+  else if (convert_time_point == "censor" & v[["OUT"]]!="Died" & v[["OUT"]]!="LOSTFU"){
+    time = 600
+  }
+  else if (convert_time_point == "censor" & (v[["OUT"]]=="Died"|v[["OUT"]]=="LOSTFU") & substr(v[["studycode"]],1,4)=="29TB"){
+    time = as.Date(v[["DateLastASS"]],format="%m/%d/%Y") - as.Date(v[["date.N0"]],format="%m/%d/%Y")
+    #if (time > 240) time = 240
+  }
+  else if (convert_time_point == "censor" & (v[["OUT"]]=="Died"|v[["OUT"]]=="LOSTFU") & substr(v[["studycode"]],1,4)=="28TB"){
+    time = as.Date(v[["DateLastASS"]],format="%m/%d/%Y") - as.Date(v[["STDAT"]],format="%m/%d/%Y")
+    #if (time > 240) time = 240
+  }
+  else if (convert_time_point != "censor" & substr(v[["studycode"]],1,4)=="29TB") {
+    culture_day = paste("date",substr(convert_time_point, nchar(convert_time_point)-3,nchar(convert_time_point)),sep = "")
+    time = as.Date(v[[culture_day]],format="%m/%d/%Y") - as.Date(v[["date.N0"]],format="%m/%d/%Y")
+  }
+  else if (convert_time_point != "censor" & substr(v[["studycode"]],1,4)=="28TB") {
+    culture_day = paste("date",substr(convert_time_point, nchar(convert_time_point)-3,nchar(convert_time_point)),sep = "")
+    time = as.Date(v[[culture_day]],format="%m/%d/%Y") - as.Date(v[["STDAT"]],format="%m/%d/%Y")
+  }
+  return(time)
+}
+
+
+# i=341
+# sputum_clean[341,]
+# row_data = sputum_clean[i,]
+# convertion_time_point= Timetoconvert(row_data)
+# # sputum_clean$First_conversion[i] = convertion_time_point
+# days_to_convert(convertion_time_point,row_data)
+
+## run conversion function for all patients
+for (i in 1:nrow(sputum_clean)){
+  row_data = sputum_clean[i,]
+  convertion_time_point= Timetoconvert(row_data)
+  sputum_clean$First_conversion[i] = convertion_time_point
+  sputum_clean$Time[i] = days_to_convert(convertion_time_point,row_data)
+  #print(i)
+}
+
+
+#------- function for calculate time at which patients stop producing sputum----
+
+Time_stop_sputum <-function(pos, v){
+  tp = 10000
+  stopifnot(pos <= length(v))
+  if(!is.na(v[[pos]]) & v[[pos]] == 'no sputum' & "Positive" %nin% as.character(v[-c(1:pos)]) & 
+     "Negative" %nin% as.character(v[-c(1:pos)])){
+    tp = pos
+  }
+  return(tp)
+}
+
+
+Time_stop_sputum_for_individual <- function(v){
+  record = c()
+  for(p in 1:length(v)){
+    temp = Time_stop_sputum(p,v)
+    record = c(record,temp)
+  }
+  Index_TP <- min(record)
+  if(Index_TP < 10000) time_point <- colnames(v)[Index_TP-1]  ## 1 timepoint previous
+  if(Index_TP == 10000) time_point <- "non-stop"
+  #print(record)
+  return(time_point)
+}
+
+Time_point_to_stop_sputum <- function(row_data) {
+  stop_result = NA
+  if(substr(row_data[["studycode"]],1,4)=="29TB"){
+    row_data_culture = row_data[which(colnames(row_data)=="Culture.N0"):which(colnames(row_data)=="Culture.T12")]
+    stop_result = Time_stop_sputum_for_individual(row_data_culture)
+  }
+  else if (substr(row_data[["studycode"]],1,4)=="28TB"){
+    row_data_culture = row_data[which(colnames(row_data)=="Culture.N0"):which(colnames(row_data)=="Culture.T24")]
+    stop_result = Time_stop_sputum_for_individual(row_data_culture)
+  }
+  return(stop_result)
+}
+
+## run conversion function for all patients
+for (i in 1:nrow(sputum_clean)){
+  row_data = sputum_clean[i,]
+  time_temp = Time_point_to_stop_sputum(row_data)
+  sputum_clean$follow_up_timepoint[i] = time_temp
+}
+
+
+##-------------------- fucntion to calculate reversion
+check_reversion_timepoint <- function(pos,v){
+  if(substr(v[["studycode"]],1,4)=="29TB"){
+    v1 = v[which(colnames(v)=="Culture.N0"):which(colnames(v)=="Culture.T12")]
+  }
+  else if(substr(v[["studycode"]],1,4)=="28TB"){
+    v1 = v[which(colnames(v)=="Culture.N0"):which(colnames(v)=="Culture.T24")]
+  }
+  check = v1[-c(1:which(colnames(v1)==conversion))]
+  temp_t = "No"
+  for (t in 1:length(check)){
+    if(check[t] == "Positive"){
+      temp_t = colnames(check)[t]
+      break
+    }
+  }
+  return(temp_t)
+}
+
+## fill in sputum data and calculate time
+for(i in 1:nrow(sputum_clean)){
+  temp_row = sputum_clean[i,]
+  conversion = temp_row$First_conversion
+  temp_reversion = NA
+  if(is.na(conversion)|conversion=="censor"){
+    temp_reversion = "censor"
+  } 
+  else {
+    temp_reversion <- check_reversion_timepoint(conversion,temp_row)
+  }
+  sputum_clean$reversion[i] <- temp_reversion
+  date_return = NA
+  if(temp_reversion %nin% c("censor", "No")  & substr(temp_row[["studycode"]],1,4)=="29TB"){
+    reversion_date = paste("date",substr(temp_reversion, nchar(temp_reversion)-3,nchar(temp_reversion)),sep = "")
+    date_return = as.Date(temp_row[[reversion_date]],format="%m/%d/%Y") - as.Date(temp_row[["date.N0"]],format="%m/%d/%Y")
+  }
+  if(temp_reversion %nin% c("censor", "No")  & substr(temp_row[["studycode"]],1,4)=="28TB"){
+    reversion_date = paste("date",substr(temp_reversion, nchar(temp_reversion)-3,nchar(temp_reversion)),sep = "")
+    date_return = as.Date(temp_row[[reversion_date]],format="%m/%d/%Y") - as.Date(temp_row[["STDAT"]],format="%m/%d/%Y")
+  }
+  sputum_clean$reversion_date[i] <- date_return
+}
+```
+
+```{r}
+sputum <- sputum_clean %>% 
+  dplyr::select(studycode, EnrolledDAT, Regimen, STDAT, DateComplete, DateLastASS, DateLastALIVE, OUT, DateDeath, DateLastFU, Last_Culture_conversion, last_time_convert, Culture_conversion, Time, follow_up_timepoint, First_conversion, age, gender, occupation, outcome, outcome2, DUR, TEMP, SYSBP, DIABP, TBTreatedBefore, BCGVaccinated, PatientHIV, Diabetes, Smoking, Over15AlcoholUnits, WBC, NEUTLE, LYMLE, MONOLE, PLAT, FASTGLUC, HbA1C, ALB, GLO, genotype, D2, D3, MDR_TB, DM, GenXpert, Cavity, Timika.score, bmi, lineage, TNF, IL6, IFN, CT_mean, clini_score) %>%
+  mutate(time=as.numeric(last_time_convert),
+         time=ifelse((is.na(time) & (Regimen=="6M")), 180,
+                     ifelse((is.na(time) & (Regimen=="8M")), 240,
+                            ifelse((is.na(time) & (Regimen=="9M")), 365,
+                                   ifelse((is.na(time) & (Regimen=="20M")), 730, time)))),
+         time_first = NA,
+         time_first = ifelse(First_conversion=="Culture.N14", 14,
+                             ifelse(First_conversion=="Culture.T01", 30,
+                                    ifelse(First_conversion=="Culture.T02", 60,
+                                           ifelse(First_conversion=="Culture.T03", 90,
+                                                  ifelse(First_conversion=="Culture.T04", 120,
+                                                         ifelse(First_conversion=="Culture.T05", 150,
+                                                                ifelse(First_conversion=="Culture.T06", 180,
+                                                                       ifelse(First_conversion=="Culture.T07", 210,
+                                                                              ifelse(First_conversion=="Culture.T08", 240,
+                                                                                     time_first))))))))),
+         EnrolledDAT = as.Date(EnrolledDAT, format="%Y/%m/%d"),
+         DateDeath = as.Date(DateDeath, format="%Y/%m/%d"),
+         DateLastFU = as.Date(DateLastFU, format="%Y/%m/%d"),
+         StartDate = EnrolledDAT,
+         EndDate = NA,
+         EndDate = ifelse(Regimen=="6M", pmin(EnrolledDAT + days(180), DateLastFU, DateDeath, na.rm=TRUE), 
+                          ifelse(Regimen=="8M", pmin(EnrolledDAT + days(240), DateLastFU, DateDeath, na.rm=TRUE), 
+                                 ifelse(Regimen=="9M", pmin(EnrolledDAT + days(365), DateLastFU, DateDeath, na.rm=TRUE), 
+                                        ifelse(Regimen=="20M", pmin(EnrolledDAT + days(730), DateLastFU, DateDeath, na.rm=TRUE),
+                                               EndDate)))),
+         EndDate = as.Date(EndDate, origin="1970-01-01"),
+         Time = difftime(EndDate, StartDate, units='days'),
+         Event = case_when(
+           outcome=="Died" ~ 2,
+           outcome=="Failed" ~ 1,
+           outcome=="Completed" ~ 0,
+           outcome=="Cured" ~ 0,
+           TRUE ~ 0
+         ),
+         time_first_all = NA,
+         time_first_all = ifelse(!is.na(time_first), time_first, as.numeric(Time)),
+         Event_first = case_when(
+           !is.na(time_first) ~ 1,
+           !is.na(DateDeath) ~ 2,
+           !is.na(DateLastFU) ~ 0,
+           TRUE ~ 0
+         ),
+         status=NA,
+         status=case_when(Culture_conversion=="censor" ~ 0,
+                          Last_Culture_conversion=="censor" ~ 0,
+                          (!is.na(Culture_conversion) & Culture_conversion!="censor") ~ 1,
+                          TRUE ~ NA_real_),
+         status=factor(status, levels = c(0,1), labels = c("censor", "conversion")),
+         status2=ifelse(outcome=="Died", 2, ifelse(status=="conversion", 1, 0)),
+         status2=factor(status2, levels = c(0,1,2), labels = c("censor", "conversion", "died")))
+```
+
+```{r, results='hide'}
+diagnose(dat) %>% flextable()
+diagnose_category(dat) %>% flextable()
+diagnose_numeric(dat) %>% flextable()
+diagnose_outlier(dat) %>% flextable()
+```
+
+# Characteristics of participants
+
+```{r, warning=FALSE, message=FALSE}
+library(gtsummary)
+library(forcats)
+
+table <- dat %>% dplyr::select(age, gender, occupation, DUR, TEMP, SYSBP, DIABP, Weight, Height, Weightloss, WLossDur, NightSweats, NightSweatsDur, LowFever, LowFeverDur, Cough, CoughDur, Sputum, SputumDur, Haemoptysis, HaemoptysisDur, ChestPain, ChestPainDur, Malaise, MalaiseDur, Dyspnea, DyspneaDur, TBcontact, Household, Working, Neighbor, TBTreatedBefore, TBType, TBTreatmentNum, BCGVaccinated, PatientHIV, HIVYears, ARTTreatment, ARTSTDATUNK, CoTrimoxazole, IntravenousDrugs, Diabetes, DiabetesYears, Insulin, Metformin, Smoking, PackPerDay, SmokingYears, Over15AlcoholUnits, RBC, HGB, WBC, NEUTLE, LYMLE, MONOLE, EOSLE, PLAT, CA, FASTGLUC, HbA1C, ALB, GLO, genotype, D2, D3, Total, study, InitialDiagnosis, MDR_TB, Classification.of.TB, DM, GenXpert, Cavity, Lung.proportion, Timika.score, bmi, bmigroup, agegroup, Amikacin, Capreomycin, Ciprofloxacin, Ethambutol, Isoniazid, Kanamycin, Moxifloxacin, Ofloxacin, Pyrazinamide, Rifampicin, Streptomycin, Drug_WGS_sum, TNF, IL6, IL10, IL1b, IFN, IL2, IL13, IL12p70, CT_mean, anemia, met, TS, alcohol, mort, symptom_severity, clini_score, clini_severity, Regimen, Last_Culture_conversion, last_time_convert, Culture_conversion, Time, follow_up_timepoint, reversion, outcome, outcome2)
+
+t <- table %>% 
+  tbl_summary(
+    by = outcome2, # split table by group
+    percent = "col",
+    missing = "no", # don't list missing data separately,
+    label = list(age = "Age",
+                 gender = "Sex"),
+    statistic = list(all_continuous() ~ "{median} ({IQR})",
+                     all_categorical() ~ "{n} ({p}%)")
+  ) %>%
+  add_n() %>% # add column with total number of non-missing observations
+  #add_p(pvalue_fun=~style_pvalue(.x,digits=2)) %>% # test for a difference between groups
+  modify_header(label = "**Variable**") %>% # update the column header
+  bold_labels()
+t
+```
+
+```{r, results='hide', warning=FALSE, message=FALSE}
+#dat_miss_out <- dat %>% dplyr::select(studycode, study, outcome2, OUT) %>%
+#  filter(is.na(outcome2)) %>% as.data.table()
+#fwrite(x=dat_miss_out, file="dat_miss_out.csv")
+```
+
+# Visualise data
+
+```{r}
+library(tidyverse)
+library(openxlsx)
+
+# Sample dataset
+df <- dat %>% select(c(2, 317:342))
+
+# Convert to long format
+df_long <- df %>%
+  pivot_longer(cols = -studycode, names_to = "timepoints", values_to = "Culture") %>%
+  mutate(timepoints = str_remove(timepoints, "Culture\\."))
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggtext)
+library(forcats)
+
+# ------------------------------
+# 📌 Creating Dataset for Visualization
+# ------------------------------
+patient_data <- df_long %>%
+  left_join(dat %>% select(studycode, Regimen), by = "studycode") %>%
+  left_join(dat %>% select(studycode, outcome), by = "studycode") %>%
+  left_join(dat %>% select(studycode, outcome2), by = "studycode") %>%
+  left_join(sputum %>% select(studycode, First_conversion), by="studycode") %>%
+  mutate(First_conversion = str_replace(First_conversion, "Culture.", ""))
+
+# ------------------------------
+# 📌 Identify First "Negative Conversion" Culture Result
+# ------------------------------
+
+patient_data <- patient_data %>%
+  mutate(First_conversion = ifelse(First_conversion=="censor" | is.na(First_conversion), Inf, First_conversion))  # Replace NA with Inf
+
+# ------------------------------
+# 📌 Setting Factor Levels for Better Visualization
+# ------------------------------
+patient_data <- patient_data %>%
+  mutate(
+    Culture = factor(
+      ifelse(Culture == "Negative", 0,
+             ifelse(Culture == "Positive", 1, 2)),
+      levels = c(0, 1, 2),
+      labels = c("Negative", "Positive", "No sputum")
+    ),
+    
+    # 📌 Set Regimen Order Explicitly
+    Regimen = factor(Regimen, levels = c("6M", "8M", "9M", "20M"))
+  )
+
+# ------------------------------
+# 📌 Order Patients by Regimen, Outcome, and First Negative Timepoint
+# ------------------------------
+patient_data <- patient_data %>%
+  arrange(Regimen, outcome2, First_conversion) %>%
+  mutate(studycode = fct_reorder2(studycode, Regimen, First_conversion))
+
+# ------------------------------
+# 📌 Generate FakeID for plot
+# ------------------------------
+
+studycode <- unique(patient_data$studycode)
+fakeid <- c(1:length(studycode))
+temp <- data.frame(fakeid, studycode)
+
+data_plot <- merge(patient_data, temp)
+
+# ------------------------------
+# 📌 Visualization
+# ------------------------------
+ggplot(data_plot, aes(
+  x = timepoints,
+  y = desc(fakeid),   # Now ordered by Regimen, Outcome2, and First Negative Conversion Timepoint
+  fill = Culture
+)) +
+  geom_tile(color = "white") +  
+  facet_grid(rows = vars(Regimen, outcome2), scales = "free_y", space = "free_y") +  # ✅ Regimen labels in correct order
+
+  # 📌 Add Culture Color Mapping
+  scale_fill_manual(values = c("Positive" = "red", "Negative" = "green", "No sputum" = "white")) +
+
+  # # 📌 Add Regimen Color Mapping (for Facet Labels)
+  # scale_color_manual(values = c("6M" = "blue", "8M" = "purple", "9M" = "orange", "20M" = "brown")) +
+  # 
+  # # 📌 Add Outcome Color Mapping (Different from Regimen)
+  # scale_fill_manual(values = c("Good outcome" = "green", "Bad outcome" = "red", "Lost FU/Not Evaluated" = "gray50")) +
+
+  labs(
+    title = "Tuberculosis Patient Follow-up Over Time",
+    subtitle = "Heatmap of Culture Status Ordered by Regimen & Outcome",
+    x = "Follow-up Timepoints",
+    y = "Number of patients",  
+    fill = "Culture Status",
+    color = "Regimen"
+  ) +
+  scale_y_continuous(breaks = c(0, 100, 200, 300, 400, 500, 600, 700, 800, 900)) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+
+    # 📌 Font Sizes Optimized for Publication
+    axis.title.x = element_text(size = 120, face = "bold"),
+    axis.title.y = element_text(size = 120, face = "bold"),  
+    axis.text.x = element_text(size = 90, angle = 90, hjust = 1),
+    
+    # 📌 Remove studycode display
+    axis.text.y = element_text(size = 90),  
+    axis.ticks.y = element_blank(),  
+    
+    # 📌 Strip Labels for Regimen & Outcome
+    strip.text.y = element_text(size = 90, angle = 0, face = "bold"),
+    
+    # 📌 Add lines between facets
+    panel.spacing.y = unit(1, "lines"),  
+    panel.border = element_rect(color = "black", fill = NA, size = 1.5),  
+    
+    # 📌 Title & Subtitle
+    plot.title = element_text(face = "bold", size = 120),
+    plot.subtitle = element_text(size = 90),
+    
+    # 📌 Legend Formatting
+    legend.background = element_rect(fill = NA),
+    legend.title = element_text(size = 90),
+    legend.text = element_text(size = 75),
+    legend.key.size = unit(1.5, "cm"),
+    legend.spacing.y = unit(1.5, "cm")
+  )
+
+# ------------------------------
+# 📌 Save the Heatmap (600 DPI for Publication)
+# ------------------------------
+
+ggsave(filename = "figures/Culture_Heatmap_Fixed_v1.png", width = 30, height = 45, dpi = 300, bg = "white")
+```
+
+```{r}
+# Create a new Excel workbook
+wb <- createWorkbook()
+addWorksheet(wb, "TB Culture Data")
+
+# Define colors for different culture statuses
+color_mapping <- c(
+  "Positive" = "#FF6961",   # Red
+  "Negative" = "#77DD77",   # Green
+  "No sputum" = "#FFD700"   # Yellow
+)
+
+# Write data to Excel
+writeData(wb, "TB Culture Data", df_long, startCol = 1, startRow = 1, colNames = TRUE)
+
+# Apply color formatting
+for (i in 2:nrow(df_long) + 1) {  # Start from row 2 (skip header)
+  status <- df_long$Culture[i - 1]  # Adjust index
+  if (status %in% names(color_mapping)) {
+    addStyle(
+      wb, "TB Culture Data",
+      style = createStyle(fgFill = color_mapping[status]),
+      rows = i, cols = 3, gridExpand = TRUE
+    )
+  }
+}
+
+# Save the file
+saveWorkbook(wb, "output/TB_Culture_Data.xlsx", overwrite = TRUE)
+
+print("Excel file with color-coded TB culture data saved successfully!")
+```
+
+# Primary analysis
+
+Complete data
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+library(glmnet)
+library(caret)
+library(MLeval)
+library(ranger)
+library(mice)
+
+# Load the data with predictors, outcome
+`%notin%` <- Negate(`%in%`)
+
+data <- dat %>%
+  dplyr::filter(outcome2!="Lost FU") %>% droplevels() %>%
+  mutate(NEU_LYM = NEUTLE/LYMLE,
+         Regimen=ifelse((Regimen=="6M" | Regimen=="8M"), 0, 1),
+         Regimen=factor(Regimen, levels = c(0,1), labels = c("6-8M", "9-20M")),
+         Smoking=ifelse(Smoking=="Never", 0, ifelse(Smoking=="Ex-Smoker", 1, 2)),
+         Smoking=factor(Smoking, levels = c(0,1,2), labels = c("Never", "Ex-Smoker", "Current Smoker")),
+         PatientHIV=na_if(PatientHIV, "Not sure"),
+         PatientHIV=ifelse(PatientHIV=="Negative", 0, 1),
+         PatientHIV=factor(PatientHIV, levels = c(0,1), labels = c("Negative", "Positive")),
+         DM=na_if(DM, "Unknown"),
+         DM=ifelse(DM=="No diabetes", 0, 1),
+         DM=factor(DM, levels = c(0,1), labels = c("No diabetes", "Diabetes/Prediabetes"))) %>%
+  dplyr::select(c(outcome2, age, bmi, DUR, TBTreatedBefore, DM, PatientHIV, Regimen, anemia, clini_score, Timika.score, CT_mean, NEU_LYM, ALB))
+
+data_noNA <- data %>% na.omit()
+  
+
+# Inspect the data
+# Inspect the data
+sample_n(data, 20)
+```
+
+```{r GGallySolution1, message=FALSE, warning=FALSE, eval=TRUE}
+library(GGally)
+ggpairs(select(data, age, bmi, DUR, clini_score, Timika.score, CT_mean, NEU_LYM, ALB)) 
+```
+
+## Imputation diagnostic checking
+
+```{r, message=FALSE, warning=FALSE}
+library(mice)
+library(VIM)
+# png(file = "../figures/vim.png", width = 1600, height = 800)
+aggr(data, plot = T, prop = T, numbers = F, combined = F, sortVars = T, cex.axis=1, gap=3, oma = c(8,5,5,2))
+# dev.off()
+```
+
+## Analysis of imputed data
+
+## Inspecting the missing data
+
+```{r}
+library(ggmice)
+#md.pattern(data)
+plot_pattern(data)
+```
+## Creating imputations
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+# Creating imputations can be done with a call to mice() as follows:
+library(mice)
+data.imp5 <- mice(data, m = 5, method = "pmm")
+```
+
+Imputations are generated according to the default method, which is, for numerical data, predictive mean matching (pmm). The default number of multiple imputations is equal to m = 5
+
+## Diagnostic checking
+
+An important step in multiple imputation is to assess whether imputations are plausible. Imputations should be values that could have been obtained had they not been missing. Imputations should be close to the data. Data values that are clearly impossible (e.g., negative counts, pregnant fathers) should not occur in the imputed data. Imputations should respect relations between variables, and reflect the appropriate amount of uncertainty about their "true" values. Diagnostic checks on the imputed data provide a way to check the plausibility of the imputations. The imputations for PatientHIV are stored as
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+data.imp5$imp$PatientHIV
+```
+
+## Extract the "tall" matrix which stacks the imputations
+
+```{r}
+data.comp5 <- complete(data.imp5, "long", include = TRUE) %>% na.omit()
+head(data.comp5)
+```
+
+The complete() function extracts the 5 imputed data sets from the data.imp5 object as a long (row-stacked) matrix with 4861 records. The missing entries in data have now been filled by the values from the first (of 5) imputation. The second completed data set can be obtained by complete(data.imp, 2). For the observed data, it is identical to the first completed data set, but it may differ in the imputed data.
+
+It is often useful to inspect the distributions of original and the imputed data. One way of doing this is to use the function stripplot() in mice 2.9, an adapted version of the same function in the package lattice (Sarkar 2008). The stripplot is created as
+
+```{r}
+stripplot(data.imp5, pch = 20, cex = 1.2)
+```
+Suppose that the complete-data analysis of interest is a logistic regression of outcome on a range of predictors. For this purpose, we can use the function with.mids(), a wrapper function that applies the complete data model to each of the imputed data sets
+
+```{r}
+fit <- with(data.imp5, glm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, family = binomial))
+```
+
+The fit object has class mipo and contains the results of 5 complete-data analyses. These can be pooled as follows:
+
+```{r}
+print(pool(fit))
+```
+More detailed output can be obtained, as usual, with the summary() function, i.e.,
+
+```{r}
+summary(pool(fit))
+```
+After multiple imputation, we find a significant effect of NEUTLE to LYMLE ratio. The column fmi contains the fraction of missing information as defined in Rubin (1987), and the column lambda is the proportion of the total variance that is attributable to the missing data (lamda = (B +B/m)/T).
+
+The pooled results are subject to simulation error and therefore depend on the seed argument of the mice() function. In order to minimize simulation error, we can use a higher number of imputations, for example m=50. It is easy to do this as
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+data.imp50 <- mice(data, m = 50, seed = 23109)
+```
+
+```{r}
+fit <- with(data.imp50, glm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, family = binomial))
+```
+
+```{r}
+summary(pool(fit))
+```
+### Extract the "tall" matrix which stacks the imputations
+
+```{r, message=FALSE, warning=FALSE}
+data.comp <- complete(data.imp50, "long", include = TRUE) %>% na.omit()
+head(data.comp)
+```
+
+```{r}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- data.comp$outcome2 %>% 
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- data.comp[training.samples, ]
+test.data <- data.comp[-training.samples, ]
+
+table(data.comp$outcome2)
+```
+
+## Computing penalised logistic regression
+
+### Lasso regression
+
+The R function model.matrix() helps to create the matrix of predictors and also automatically converts categorical predictors to appropriate dummy variables, which is required for the glmnet() function.
+
+```{r}
+# Dummy code categorical predictor variables
+x <- model.matrix(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, train.data)[,-1]
+
+# Convert the outcome (class) to a numerical variable
+y <- ifelse(train.data$outcome2 == "Bad outcome", 1, 0)
+```
+
+```{r}
+glmmod <- glmnet(x, y, family = "binomial", alpha = 1, lambda = NULL)
+plot(glmmod, xvar="lambda")
+```
+
+Find the optimal value of lambda that minimizes the cross-validation error:
+
+```{r}
+# Find the best lambda using cross-validation
+set.seed(123)
+cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial")
+plot(cv.lasso)
+```
+
+```{r}
+cvob3a <- cv.glmnet(x, y, family = "binomial", type.measure = "auc")
+plot(cvob3a)
+```
+
+The plot displays the cross-validation error according to the log of lambda. The left dashed vertical line indicates that the log of the optimal value of lambda is approximately -7.5, which is the one that minimizes the prediction error. This lambda value will give the most accurate model. The exact value of lambda can be viewed as follow:
+
+```{r}
+cv.lasso$lambda.min
+```
+Generally, the purpose of regularization is to balance accuracy and simplicity. This means, a model with the smallest number of predictors that also gives a good accuracy. To this end, the function cv.glmnet() finds also the value of lambda that gives the simplest model but also lies within one standard error of the optimal value of lambda. This value is called lambda.1se.
+
+```{r}
+cv.lasso$lambda.1se
+```
+
+Using lambda.min as the best lambda, gives the following regression coefficients:
+
+```{r}
+coef(cv.lasso, cv.lasso$lambda.min)
+```
+From the output above, only 1 variable has a coefficient exactly equal to zero.
+
+Using lambda.1se as the best lambda, gives the following regression coefficients:
+
+```{r}
+coef(cv.lasso, cv.lasso$lambda.1se)
+```
+
+Using lambda.1se, only 4 variables have non-zero coefficients. The coefficients of all other variables have been set to zero by the lasso algorithm, reducing the complexity of the model.
+
+Setting lambda = lambda.1se produces a simpler model compared to lambda.min, but the model might be a little bit less accurate than the one obtained with lambda.min.
+
+In the next sections, we’ll compute the final model using lambda.min and then assess the model accuracy against the test data. We’ll also discuss the results obtained by fitting the model using lambda = lambda.1se.
+
+### Compute the final lasso model:
+
+Compute the final model using lambda.min:
+
+```{r, message=FALSE, warning=FALSE}
+# Final model with lambda.min
+lasso.model <- glmnet(x, y, alpha = 1, family = "binomial", lambda = cv.lasso$lambda.min)
+
+# Make prediction on test data
+x.test <- model.matrix(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, test.data)[,-1]
+
+preds <- predict(lasso.model, newx = x.test, type = 'response')
+
+probabilities <- lasso.model %>% predict(newx = x.test, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "Bad outcome", "Good outcome")
+
+# Model accuracy
+observed.classes <- test.data$outcome2
+observed <- test.data$outcome2
+mean(predicted.classes == observed.classes)
+```
+
+Compute the final model using lambda.1se:
+
+```{r}
+# Final lasso model with lambda.1se
+lasso.model <- glmnet(x, y, alpha = 1, family = "binomial",
+                      lambda = cv.lasso$lambda.1se)
+
+# Make prediction on test data
+x.test <- model.matrix(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, test.data)[,-1]
+
+preds <- predict(lasso.model, newx = x.test, type = 'response')
+
+probabilities <- lasso.model %>% predict(newx = x.test, type = 'response')
+predicted.classes <- ifelse(probabilities > 0.5, "Bad outcome", "Good outcome")
+
+observed.classes <- test.data$outcome2
+mean(predicted.classes == observed.classes)
+```
+
+```{r}
+# Fit full logistic model
+full.model <- glm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, data = data, family = binomial, na.action = "na.omit")
+
+# Make predictions
+probabilities.LR <- full.model %>% predict(test.data, type = "response")
+predicted.classes.LR <- ifelse(probabilities.LR > 0.5, "Bad outcome", "Good outcome")
+# Model accuracy
+observed.classes.LR <- test.data$outcome2
+mean(predicted.classes.LR == observed.classes.LR)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(ROCR)
+library(pROC)
+par(pty="s")
+roc1<-pROC::roc(observed.classes, as.vector(preds), percent=T, plot=TRUE, grid=TRUE, ci=TRUE, legacy.axes = TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#E31A1C", print.auc.x=92, print.auc.y=90, print.auc = TRUE, print.auc.cex=1.25, lwd=3, cex.lab=1.5, cex.axis=1.5)
+
+roc2<-plot.roc(test.data$outcome2, as.vector(probabilities.LR), percent=T, grid=TRUE, ci=TRUE, col="#377eb8", add=TRUE, print.auc.x=80, print.auc.y=75, print.auc = TRUE, print.auc.cex=1.25, lwd=3, cex.lab=1.5, cex.axis=1.5)
+
+legend("bottomright", legend=c("Lasso regression", "Logistic regression"), col=c("#E31A1C", "#377eb8"), lwd=3, cex=1.25)
+par(pty="m")
+
+roc.test(roc1, roc2, reuse.auc=F)
+```
+
+## Predicted values for each of the imputed subset
+
+# Full model
+
+```{r, message=FALSE, warning=FALSE}
+library(caret)
+library(DescTools)
+# Fit the final model with the selected variables
+# formula <- as.formula(paste("status ~", paste(selected_variables, collapse = " + ")))
+# final_model <- glm(formula, data = data_imputed, family = binomial())
+library(future)
+library(parallel)
+# detectCores()
+# registerDoParallel(6)
+plan(sequential)
+plan(multisession, workers=3)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+n_bootstraps <- 20
+
+# Create a list to store the results for each imputed dataset
+results_list_full <- vector("list", n_imputations)
+# Impute the missing values
+imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+
+# Loop over the imputations
+for (i in 1:n_imputations) {
+  
+    #Make a complete dataset of imputation in long format and remove NA
+  data_imputed <- complete(imp, action=i, include = F)
+  
+  # Create a list to store the results for each bootstrap
+  results_boot_full<- vector("list", n_bootstraps)
+  
+  # Loop over the bootstraps
+  for (j in 1:n_bootstraps) {
+    results_boot_full[[j]] <- future({
+    # Create the bootstrap sample
+    index <- sample(1:dim(data_imputed)[1], replace = T)
+    data_boot <- data_imputed[index, ]
+    
+    set.seed(123)
+    training.samples <- data_boot$outcome2 %>%
+      createDataPartition(p=0.7, list = FALSE)
+    train.data <- data_boot[training.samples, ] %>% na.omit()
+    test.data <- data_boot[-training.samples, ] %>% na.omit()
+    
+    # Fit model and make predictions
+    full.model <- glm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, data = train.data, family = binomial)
+    
+    probabilities.FULL <- full.model %>% predict(test.data, type = "response")
+    predicted.classes.FULL <- ifelse(probabilities.FULL > 0.5, "Died", "Discharged")
+    
+    # Model accuracy
+    observed.classes.FULL <- test.data$outcome2
+    mean(predicted.classes.FULL == observed.classes.FULL)
+    
+    # Store the final variables and their coefficients
+    final_variables <- names(full.model$coefficients)
+    final_coefs <- coef(full.model)
+    final_vars <- vcov(full.model)
+    roc1 <- pROC::roc(observed.classes.FULL, as.vector(probabilities.FULL))
+    brier1 <- DescTools::BrierScore(full.model)
+    
+    # Store the results for this bootstrap
+    list(final_variables = final_variables,
+                              final_coefs = final_coefs,
+                              final_vars = final_vars,
+                              roc1 = roc1,
+                              brier1 = brier1)
+  }, gc=T, seed=T)
+  cat(j)
+  }
+  # Combine the results for all bootstraps for this imputed dataset
+  results_list_full[[i]] <- lapply(results_boot_full, value)
+  
+}
+
+# Unlist results
+results_list_full |> unlist(recursive = F) |> purrr::transpose() -> .
+final_coefs_full <- .$final_coefs
+final_vars_full <- .$final_vars
+final_variables_full <- .$final_variables
+roc1_full <- .$roc1 |> purrr::transpose()
+brier1_full <- .$brier1
+
+###Pool MI using Rubin's rules
+Q_mean_reg <- apply(array(unlist(final_coefs_full), c(1,14,n_imputations*n_bootstraps))[1,,], 1, mean) # Q_mean_reg contains the coefficients from the model
+U_mean_reg <- diag(apply(array(unlist(final_vars_full), c(14,14,n_imputations*n_bootstraps)), 1:2, mean)) # U the within-imputation variability i.e. the mean of the squared standard errors within the imputed data sets
+B_var_reg <- apply(array(unlist(final_coefs_full), c(1,14,n_imputations*n_bootstraps))[1,,], 1, var) # B the between-imputation variability caused by the differences in imputed values across the data sets
+# B_var_reg <-  apply((Q_mean_reg - array(unlist(final_coefs_aic), c(1,20,n_imputations*n_bootstraps))[1,,])^2, 1, sum)/ (n_imputations*n_bootstraps - 1) # B the between-imputation variability caused by the differences in imputed values across the data sets
+T_var_reg <- sqrt(U_mean_reg + (1 + 1/(n_imputations*n_bootstraps))*B_var_reg) # The overall variance T associated with Q
+lower_ci_reg <- Q_mean_reg - 1.96*T_var_reg
+upper_ci_reg <- Q_mean_reg + 1.96*T_var_reg
+z <- Q_mean_reg/T_var_reg
+p <- (1 - pnorm(abs(z), 0, 1)) * 2 # 2-tailed z test
+
+Q_mean_reg #Q_mean_reg contains the coefficients from the model
+T_var_reg #T_var_reg contains the standard errors from the model
+lower_ci_reg #lower limits of 95% CIs
+upper_ci_reg #upper limits of 95% CIs
+p #2-tailed p value
+
+result_pool_full <- rbind(Q_mean_reg, T_var_reg, lower_ci_reg, upper_ci_reg, p) %>% data.frame()
+result_pool_full <- t(result_pool_full)
+rownames(result_pool_full) <- final_variables_full[[1]]
+colnames(result_pool_full) <- c("Coef.", "Std.Error", "Lower CI", "Upper CI", "P_value")
+result_pool_full
+
+###Pool MI using Rubin's rules - ROC & Brier
+roc1p_full <- mean(array(unlist(as.numeric(roc1_full$auc)), c(1,1,n_imputations*n_bootstraps))[1,,])
+brier1p_full <- mean(array(unlist(brier1_full), c(1,1,n_imputations*n_bootstraps))[1,,])
+
+# Save results for later use
+save(results_list_full, result_pool_full, roc1p_full, brier1p_full, file="FULL_results.RData")
+```
+
+# Model display - FULL
+
+```{r, message=FALSE, warning=FALSE}
+# Model display ------------------------
+library(mice)
+library(rms)
+library(car)
+#################### do this on stacked MI data
+# Set seed for reproducibility
+set.seed(1234)
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+data.imp.long <- complete(imp, "long", include = F)
+
+dd <- datadist(data.imp.long); options(datadist = 'dd')
+f <- rms::lrm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, data = na.omit(data.imp.long), x=TRUE,y=TRUE)
+
+car::vif(f)
+
+f <- Newlabels(f, c("Age, years", "BMI, kg/m\u00B2", "Duration of illness", "TB treatment before", "Diabetes", "HIV positive", "Regimen", "Anemia", "Clinical score", "Timika score", "CT mean", "Neutrophil/Lymphocyte ratio", "Albumin"))
+
+# ss <-  c(.05 ,.1 ,.2 ,.3 ,.4 ,.5 ,.6 ,.7 ,.8 ,.9 ,.95 )
+
+plot(nomogram(fit = f, lp = F, 
+              vnames="labels",
+              varname.label=TRUE, varname.label.sep="=",
+              fun = plogis, 
+              fun.at=c(.001,.01,.05,seq(.1,.9,by=.1),.95,.99,.999),
+              funlabel="Risk of Death"))
+
+save(data, data.imp.long, file="data.RData")
+```
+
+### Validating fitted models with rms::validate() and rms:calibrate()
+
+```{r}
+(val <- validate(f, B = 200))
+(c_opt_corr <- 0.5 * (val[1, 5] + 1))
+```
+
+```{r}
+cal <- calibrate(f, B = 200)
+plot(cal)
+
+set.seed(13032023)
+val_new <- rms::validate(f, B = 200)
+  
+shrink_factor <- round(val_new["Slope","index.corrected"], 2)
+c_corrected <- round(0.5 * (1 + val_new["Dxy","index.corrected"]), 2)
+```
+
+# Plotting mean ROC curve for multiple ROC curves - FULL
+
+```{r, message=FALSE, warning=FALSE}
+predictions_100_samples <- data.frame(
+    Sample = rep(c(1:100), times = 195),
+    PredictionValues = c(rnorm(n = 9750), rnorm(n = 9750, mean = 1)),
+    RealClass = c(rep("benign", times = 9750), rep("pathogenic", times = 9750))
+)
+
+library(cutpointr)
+library(tidyverse)
+mean_roc <- function(data, cutoffs = seq(from = -5, to = 5, by = 0.5)) {
+    map_df(cutoffs, function(cp) {
+        out <- cutpointr(data = data, x = PredictionValues, class = RealClass,
+                         subgroup = Sample, method = oc_manual, cutpoint = cp,
+                         pos_class = "pathogenic", direction = ">=")
+        data.frame(cutoff = cp, 
+                   sensitivity = mean(out$sensitivity),
+                   specificity = mean(out$specificity))
+    })
+}
+
+mr <- mean_roc(predictions_100_samples)
+ggplot(mr, aes(x = 1 - specificity, y = sensitivity)) + 
+    geom_step() + geom_point() +
+    theme(aspect.ratio = 1)
+```
+
+```{r, message=FALSE, warning=FALSE}
+# plot the separate ROC curves and the added mean ROC curve with cutpointr:
+
+cutpointr(data = predictions_100_samples, 
+          x = PredictionValues, class = RealClass, subgroup = Sample,
+          pos_class = "pathogenic", direction = ">=") %>% 
+    plot_roc(display_cutpoint = F) + theme(legend.position="none") +
+    geom_line(data = mr, mapping = aes(x = 1 - specificity, y = sensitivity), 
+              color = "black")
+```
+
+```{r, message=FALSE, warning=FALSE}
+# Unlist results ROC
+results_list_full |> unlist(recursive = F) |> purrr::transpose() -> .
+roc1_full <- .$roc1 |> purrr::transpose()
+roc1_full |> unlist(recursive = F) -> .
+
+PredictionValues <- roc1_full$predictor |> unlist() 
+RealClass <- roc1_full$response %>% unlist()
+
+sampledList <- lapply(seq_along(roc1_full$predictor), function(i) {
+  setNames(roc1_full$predictor[[i]], paste(i, seq_along(roc1_full$predictor[[i]]), sep = "."))
+})
+Sample <- lapply(seq_along(sampledList), function(i) {as.numeric(gsub("\\..*", "", names(sampledList[[i]])))}) %>% unlist()
+
+sensitivity <- roc1_full$sensitivities %>% unlist()
+specificity <- roc1_full$specificities %>% unlist()
+thresholds <- roc1_full$thresholds %>% unlist()
+
+predictions_all_samples <- data.frame(
+    Sample = Sample,
+    PredictionValues = PredictionValues,
+    RealClass = RealClass
+)
+
+library(cutpointr)
+library(tidyverse)
+mean_roc <- function(data, cutoffs = seq(from = 0, to = 1, by = 0.05)) {
+    map_df(cutoffs, function(cp) {
+        out <- cutpointr(data = data, x = PredictionValues, class = RealClass,
+                         subgroup = Sample, method = oc_manual, cutpoint = cp,
+                         pos_class = "Bad outcome", direction = ">=")
+        data.frame(cutoff = cp, 
+                   sensitivity = mean(out$sensitivity),
+                   specificity = mean(out$specificity))
+    })
+}
+
+mr <- mean_roc(predictions_all_samples)
+
+ggplot(mr, aes(x = 1 - specificity, y = sensitivity)) + 
+    geom_step() + geom_point() +
+    theme(aspect.ratio = 1)
+
+# plot the separate ROC curves and the added mean ROC curve with cutpointr:
+# png(file = "../figures/roc_full.png", width = 600, height = 500)
+cutpointr(data = predictions_all_samples, 
+          x = PredictionValues, class = RealClass, subgroup = Sample,
+          pos_class = "Bad outcome", direction = ">=") %>%
+  plot_roc(display_cutpoint = T) + theme(legend.position="none") +
+  geom_line(data = mr, mapping = aes(x = 1 - specificity, y = sensitivity), color = "black") +
+  annotate("text", x=0.2, y=0.9, label=paste("Mean AUC", round(roc1p_full, 3), sep = "="), size=4) +
+  annotate("text", x=0.2, y=0.85, label=paste("Mean Brier score", round(brier1p_full, 3), sep = "="), size=4)
+# dev.off()
+```
+
+# Analysis in imputed subset (50 imputation, 200 bootstrap) - LASSO with rcs()
+
+```{r, message=FALSE, warning=FALSE}
+library(mice)
+library(boot)
+library(MASS)
+library(pROC)
+library(calibrate)
+library(rms)
+library(caret)
+library(glmnet)
+library(future)
+library(future.apply)
+library(doParallel)
+
+plan(sequential)
+detectCores()
+# registerDoParallel(6)
+plan(multisession, workers=3)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Load the dataset
+
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+n_bootstraps <- 20
+
+# Create a list to store the results for each imputed dataset
+results_list_lasso <- vector("list", n_imputations)
+
+# Impute the missing values
+imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+
+# Loop over the imputations
+for (i in 1:n_imputations) {
+  
+  #Make a complete dataset of imputation in long format and remove NA
+  data_imputed <- complete(imp, action=i, include = F)
+  
+  # Create a list to store the results for each bootstrap
+  results_boot_lasso <- vector("list", n_bootstraps)
+  
+  # Loop over the bootstraps
+  for (j in 1:n_bootstraps) {
+    results_boot_lasso[[j]] <- future({
+    # Create the bootstrap sample
+    index <- sample(1:dim(data_imputed)[1], replace = T)
+    data_boot <- data_imputed[index, ]
+    
+    # Split the data into training and test set
+    training.samples <- data_boot$outcome2 %>%
+      createDataPartition(p=0.7, list = FALSE)
+    train.data <- data_boot[training.samples, ] %>% na.omit()
+    test.data <- data_boot[-training.samples, ] %>% na.omit()
+  
+    # Fit LASSO model
+    # Dummy code categorical predictor variables
+    x <- model.matrix(outcome2~rcs(age,3)+rcs(bmi,3)+rcs(DUR,3)+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+rcs(clini_score,3)+rcs(Timika.score,3)+rcs(CT_mean,3)+rcs(NEU_LYM,3)+rcs(ALB,3), train.data)[,-1]
+    
+    # Convert the outcome (class) to a numerical variable
+    y <- ifelse(train.data$outcome2 == "Bad outcome", 1, 0)
+    
+    # Find the best lambda using cross-validation
+    cv.lasso <- cv.glmnet(x, y, alpha = 1, family = "binomial")
+    
+    # Final lasso model with lambda.se
+    lasso.model <- glmnet(x, y, alpha = 1, family = "binomial",
+                      lambda = cv.lasso$lambda.1se)
+    
+    # Store the selected variables and their coefficients
+    selected_vars_lasso <- names(coef(lasso.model)[,1][coef(lasso.model)[,1]!=0])[-1]
+    selected_coefs_lasso <- coef(lasso.model)[,1][coef(lasso.model)[,1]!=0][-1]
+    
+    # Store the results for this bootstrap
+    list(selected_vars_lasso = selected_vars_lasso,
+                                    selected_coefs_lasso = selected_coefs_lasso)
+    
+  }, gc=T, seed=T)
+  cat(j)
+  }
+  # Combine the results for all bootstraps for this imputed dataset
+  results_list_lasso[[i]] <- lapply(results_boot_lasso, value)
+  
+}
+
+# Calculate the proportion of times each variable was selected
+variable_counts_lasso <- table(unlist(lapply(results_list_lasso, function(x) {
+  unlist(lapply(x, function(y) y$selected_vars_lasso))
+})))
+variable_proportions_lasso <- variable_counts_lasso/(n_imputations*n_bootstraps)
+
+# Select the variables that appeared in >90% of the models
+selected_variables_lasso <- names(variable_proportions_lasso[variable_proportions_lasso > 0])
+# selected_variables[5] <- "comor"
+# selected_variables[9] <- "Gender"
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(caret)
+library(DescTools)
+# Fit the final model with the selected variables
+# formula <- as.formula(paste("status ~", paste(selected_variables, collapse = " + ")))
+# final_model <- glm(formula, data = data_imputed, family = binomial())
+library(future)
+# detectCores()
+# registerDoParallel(6)
+plan(sequential)
+plan(multisession, workers=3)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+n_bootstraps <- 20
+
+# Create a list to store the results for each imputed dataset
+results_list_lasso <- vector("list", n_imputations)
+
+# Impute the missing values
+imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+
+# Loop over the imputations
+for (i in 1:n_imputations) {
+  
+    #Make a complete dataset of imputation in long format and remove NA
+  data_imputed <- complete(imp, action=i, include = F)
+  
+  # Create a list to store the results for each bootstrap
+  results_boot_lasso <- vector("list", n_bootstraps)
+  
+  # Loop over the bootstraps
+  for (j in 1:n_bootstraps) {
+    results_boot_lasso[[j]] <- future({
+    # Create the bootstrap sample
+    index <- sample(1:dim(data_imputed)[1], replace = T)
+    data_boot <- data_imputed[index, ]
+    
+    set.seed(123)
+    training.samples <- data_boot$outcome2 %>%
+      createDataPartition(p=0.7, list = FALSE)
+    train.data <- data_boot[training.samples, ] %>% na.omit()
+    test.data <- data_boot[-training.samples, ] %>% na.omit()
+    
+    # Fit model and make predictions
+    final_model <- glm(outcome2 ~ anemia + PatientHIV + age + clini_score + DUR + NEU_LYM + Timika.score, data = train.data, family = binomial(link = "logit"))
+    
+    probabilities.LASSO <- final_model %>% predict(test.data, type = "response")
+    predicted.classes.LASSO <- ifelse(probabilities.LASSO > 0.5, "Died", "Discharged")
+    
+    # Model accuracy
+    observed.classes.LASSO <- test.data$outcome2
+    mean(predicted.classes.LASSO == observed.classes.LASSO)
+    
+    # Store the final variables and their coefficients
+    final_variables <- names(final_model$coefficients)
+    final_coefs <- coef(final_model)
+    final_vars <- vcov(final_model)
+    roc1 <- pROC::roc(observed.classes.LASSO, as.vector(probabilities.LASSO))
+    brier1 <- DescTools::BrierScore(final_model)
+    
+    # Store the results for this bootstrap
+    list(final_variables = final_variables,
+                              final_coefs = final_coefs,
+                              final_vars = final_vars,
+                              roc1 = roc1,
+                              brier1 = brier1)
+  }, gc=T, seed=T)
+  cat(j)
+  }
+  # Combine the results for all bootstraps for this imputed dataset
+  results_list_lasso[[i]] <- lapply(results_boot_lasso, value)
+  
+}
+
+# Unlist
+results_list_lasso |> unlist(recursive = F) |> purrr::transpose() -> .
+final_coefs_lasso <- .$final_coefs
+final_vars_lasso <- .$final_vars
+final_variables_lasso <- .$final_variables
+roc1_lasso <- .$roc1 |> purrr::transpose()
+brier1_lasso <- .$brier1
+
+
+###Pool MI using Rubin's rules
+Q_mean_reg <- apply(array(unlist(final_coefs_lasso), c(1,8,n_imputations*n_bootstraps))[1,,], 1, mean) # Q_mean_reg contains the coefficients from the model
+U_mean_reg <- diag(apply(array(unlist(final_vars_lasso), c(8,8,n_imputations*n_bootstraps)), 1:2, mean)) # U the within-imputation variability i.e. the mean of the squared standard errors within the imputed data sets
+B_var_reg <- apply(array(unlist(final_coefs_lasso), c(1,8,n_imputations*n_bootstraps))[1,,], 1, var) # B the between-imputation variability caused by the differences in imputed values across the data sets
+T_var_reg <- sqrt(U_mean_reg + (1 + 1/(n_imputations*n_bootstraps))*B_var_reg) # The overall variance T associated with Q
+lower_ci_reg <- Q_mean_reg - 1.96*T_var_reg
+upper_ci_reg <- Q_mean_reg + 1.96*T_var_reg
+z <- Q_mean_reg/T_var_reg
+p <- (1 - pnorm(abs(z), 0, 1)) * 2 # 2-tailed z test
+
+Q_mean_reg #Q_mean_reg contains the coefficients from the model
+T_var_reg #T_var_reg contains the standard errors from the model
+lower_ci_reg #lower limits of 95% CIs
+upper_ci_reg #upper limits of 95% CIs
+p #2-tailed p value
+
+result_pool_lasso <- rbind(Q_mean_reg, T_var_reg, lower_ci_reg, upper_ci_reg, p) %>% data.frame()
+result_pool_lasso <- t(result_pool_lasso)
+rownames(result_pool_lasso) <- final_variables_lasso[[1]]
+colnames(result_pool_lasso) <- c("Coef.", "Std.Error", "Lower CI", "Upper CI", "P_value")
+result_pool_lasso
+
+###Pool MI using Rubin's rules - ROC & Brier
+roc1p_lasso <- mean(array(unlist(as.numeric(roc1_lasso$auc)), c(1,1,n_imputations*n_bootstraps))[1,,])
+brier1p_lasso <- mean(array(unlist(brier1_lasso), c(1,1,n_imputations*n_bootstraps))[1,,])
+
+# Save results for later use
+save(selected_variables_lasso, results_list_lasso, result_pool_lasso, roc1p_lasso, brier1p_lasso, file="LASSO_results.RData")
+```
+
+# Model display - LASSO
+
+```{r, message=FALSE, warning=FALSE}
+# Model display ------------------------
+library(mice)
+library(rms)
+#################### do this on stacked MI data
+# Set seed for reproducibility
+set.seed(1234)
+# Set the number of imputations and bootstraps
+# n_imputations <- 50
+# imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+# data.imp.long <- complete(imp, "long", include = F)
+
+dd <- datadist(data.imp.long); options(datadist = 'dd')
+f <- rms::lrm(outcome2 ~ anemia + PatientHIV + age + clini_score + DUR + NEU_LYM + Timika.score, data = na.omit(data.imp.long), x=TRUE, y=TRUE)
+
+f <- Newlabels(f, c("Anemia", "HIV positive", "Age, years", "Clinical score", "Duration of illness, days", "Neutrophil/Lymphocyte ratio", "Timika score"))
+
+# ss <-  c(.05 ,.1 ,.2 ,.3 ,.4 ,.5 ,.6 ,.7 ,.8 ,.9 ,.95 )
+
+plot(nomogram(fit = f, lp = F, 
+              vnames="labels",
+              varname.label=TRUE, varname.label.sep="=",
+              fun = plogis, 
+              fun.at=c(.001,.01,.05,seq(.1,.9,by=.1),.95,.99,.999),
+              funlabel="Risk of Death"))
+```
+
+## Validating fitted models - LASSO
+
+```{r}
+(val <- validate(f, B = 200))
+(c_opt_corr <- 0.5 * (val[1, 5] + 1))
+```
+
+```{r}
+cal <- rms::calibrate(f, B = 200)
+# png(file = "../figures/cal_lasso.png", width = 600, height = 500)
+plot(cal, cex.axis=1, cex=0.8)
+# dev.off()
+```
+
+## Plotting mean ROC curve for multiple ROC curves - LASSO
+
+```{r, message=FALSE, warning=FALSE}
+# Unlist results ROC
+results_list_lasso |> unlist(recursive = F) |> purrr::transpose() -> .
+roc1_lasso <- .$roc1 |> purrr::transpose()
+roc1_lasso |> unlist(recursive = F) -> .
+
+PredictionValues <- roc1_lasso$predictor |> unlist() 
+RealClass <- roc1_lasso$response %>% unlist()
+
+sampledList <- lapply(seq_along(roc1_lasso$predictor), function(i) {
+  setNames(roc1_lasso$predictor[[i]], paste(i, seq_along(roc1_lasso$predictor[[i]]), sep = "."))
+})
+Sample <- lapply(seq_along(sampledList), function(i) {as.numeric(gsub("\\..*", "", names(sampledList[[i]])))}) %>% unlist()
+
+sensitivity <- roc1_lasso$sensitivities %>% unlist()
+specificity <- roc1_lasso$specificities %>% unlist()
+thresholds <- roc1_lasso$thresholds %>% unlist()
+
+predictions_all_samples <- data.frame(
+    Sample = Sample,
+    PredictionValues = PredictionValues,
+    RealClass = RealClass
+)
+
+library(cutpointr)
+library(tidyverse)
+mean_roc <- function(data, cutoffs = seq(from = 0, to = 1, by = 0.05)) {
+    map_df(cutoffs, function(cp) {
+        out <- cutpointr(data = data, x = PredictionValues, class = RealClass,
+                         subgroup = Sample, method = oc_manual, cutpoint = cp,
+                         pos_class = "Bad outcome", direction = ">=")
+        data.frame(cutoff = cp, 
+                   sensitivity = mean(out$sensitivity),
+                   specificity = mean(out$specificity))
+    })
+}
+
+mr <- mean_roc(predictions_all_samples)
+
+ggplot(mr, aes(x = 1 - specificity, y = sensitivity)) + 
+    geom_step() + geom_point() +
+    theme(aspect.ratio = 1)
+
+# plot the separate ROC curves and the added mean ROC curve with cutpointr:
+# png(file = "../figures/roc_lasso.png", width = 600, height = 500)
+cutpointr(data = predictions_all_samples, 
+          x = PredictionValues, class = RealClass, subgroup = Sample,
+          pos_class = "Bad outcome", direction = ">=") %>%
+  plot_roc(display_cutpoint = T) + theme(legend.position="none") +
+  geom_line(data = mr, mapping = aes(x = 1 - specificity, y = sensitivity), color = "black") +
+  annotate("text", x=0.2, y=0.9, label=paste("Mean AUC", round(roc1p_lasso, 3), sep = "="), size=4) +
+  annotate("text", x=0.2, y=0.85, label=paste("Mean Brier score", round(brier1p_lasso, 3), sep = "="), size=4)
+# dev.off()
+```
+
+# Analysis in imputed subset (50 imputation, 200 bootstrap) - AIC-based with rcs()
+
+```{r, message=FALSE, warning=FALSE}
+library(mice)
+library(boot)
+library(MASS)
+library(pROC)
+library(calibrate)
+library(rms)
+library(caret)
+library(glmnet)
+library(future)
+library(future.apply)
+library(doParallel)
+
+plan(sequential)
+detectCores()
+# registerDoParallel(6)
+plan(multisession, workers=3)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Load the dataset
+
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+n_bootstraps <- 20
+
+# Create a list to store the results for each imputed dataset
+results_list_aic <- vector("list", n_imputations)
+# Impute the missing values
+imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+
+# Loop over the imputations
+for (i in 1:n_imputations) {
+  
+  #Make a complete dataset of imputation in long format and remove NA
+  data_imputed <- complete(imp, action=i, include = F)
+  
+  # Create a list to store the results for each bootstrap
+  results_boot_aic <- vector("list", n_bootstraps)
+  
+  # Loop over the bootstraps
+  for (j in 1:n_bootstraps) {
+    results_boot_aic[[j]] <- future({
+    # Create the bootstrap sample
+    index <- sample(1:dim(data_imputed)[1], replace = T)
+    data_boot <- data_imputed[index, ]
+    
+    # Run the stepwise backward model selection with AIC stopping rule
+    model <- glm(outcome2~rcs(age,3)+rcs(bmi,3)+rcs(DUR,3)+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+rcs(clini_score,3)+rcs(Timika.score,3)+rcs(CT_mean,3)+rcs(NEU_LYM,3)+rcs(ALB,3), data = na.omit(data_boot), family = binomial(link = "logit"))
+    # step_model <- step(model, direction = "backward", trace = 1)
+    step_model <- stepAIC(model, direction = "backward", trace = FALSE)
+    
+    # Store the selected variables and their coefficients
+    selected_vars_aic <- names(step_model$coefficients)[-1]
+    selected_coefs_aic <- coef(step_model)[-1]
+    
+    # Store the results for this bootstrap
+    list(selected_vars_aic = selected_vars_aic,
+                              selected_coefs_aic = selected_coefs_aic)
+  }, gc=T, seed=T)
+  cat(j)
+  }
+  # Combine the results for all bootstraps for this imputed dataset
+  results_list_aic[[i]] <- lapply(results_boot_aic, value)
+  
+}
+
+# Calculate the proportion of times each variable was selected
+variable_counts_aic <- table(unlist(lapply(results_list_aic, function(x) {
+  unlist(lapply(x, function(y) y$selected_vars_aic))
+})))
+variable_proportions_aic <- variable_counts_aic/(n_imputations*n_bootstraps)
+
+# Select the variables that appeared in >90% of the models
+selected_variables_aic <- names(variable_proportions_aic[variable_proportions_aic > 0.5])
+# selected_variables[5] <- "comor"
+# selected_variables[9] <- "Gender"
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(caret)
+library(DescTools)
+# Fit the final model with the selected variables
+# formula <- as.formula(paste("status ~", paste(selected_variables, collapse = " + ")))
+# final_model <- glm(formula, data = data_imputed, family = binomial())
+library(future)
+# detectCores()
+# registerDoParallel(6)
+plan(sequential)
+plan(multisession, workers=3)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+n_bootstraps <- 20
+
+# Create a list to store the results for each imputed dataset
+results_list_aic <- vector("list", n_imputations)
+# Impute the missing values
+imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+
+# Loop over the imputations
+for (i in 1:n_imputations) {
+  
+    #Make a complete dataset of imputation in long format and remove NA
+  data_imputed <- complete(imp, action=i, include = F)
+  
+  # Create a list to store the results for each bootstrap
+  results_boot_aic <- vector("list", n_bootstraps)
+  
+  # Loop over the bootstraps
+  for (j in 1:n_bootstraps) {
+    results_boot_aic[[j]] <- future({
+    # Create the bootstrap sample
+    index <- sample(1:dim(data_imputed)[1], replace = T)
+    data_boot <- data_imputed[index, ]
+    
+    set.seed(123)
+    training.samples <- data_boot$outcome2 %>%
+      createDataPartition(p=0.8, list = FALSE)
+    train.data <- data_boot[training.samples, ] %>% na.omit()
+    test.data <- data_boot[-training.samples, ] %>% na.omit()
+    
+    # Fit model and make predictions
+    final_model <- glm(outcome2 ~ age + clini_score + NEU_LYM, data = train.data, family = binomial(link = "logit"))
+    
+    probabilities.AIC <- final_model %>% predict(test.data, type = "response")
+    predicted.classes.AIC <- ifelse(probabilities.AIC > 0.5, "Died", "Discharged")
+    
+    # Model accuracy
+    observed.classes.AIC <- test.data$outcome2
+    mean(predicted.classes.AIC == observed.classes.AIC)
+    
+    # Store the final variables and their coefficients
+    final_variables <- names(final_model$coefficients)
+    final_coefs <- coef(final_model)
+    final_vars <- vcov(final_model)
+    roc1 <- pROC::roc(observed.classes.AIC, as.vector(probabilities.AIC))
+    brier1 <- DescTools::BrierScore(final_model)
+    
+    # Store the results for this bootstrap
+    list(final_variables = final_variables,
+                              final_coefs = final_coefs,
+                              final_vars = final_vars,
+                              roc1 = roc1,
+                              brier1 = brier1)
+  }, gc=T, seed=T)
+  cat(j)
+  }
+  # Combine the results for all bootstraps for this imputed dataset
+  results_list_aic[[i]] <- lapply(results_boot_aic, value)
+  
+}
+
+# Unlist results
+results_list_aic |> unlist(recursive = F) |> purrr::transpose() -> .
+final_coefs_aic <- .$final_coefs
+final_vars_aic <- .$final_vars
+final_variables_aic <- .$final_variables
+roc1_aic <- .$roc1 |> purrr::transpose()
+brier1_aic <- .$brier1
+
+###Pool MI using Rubin's rules
+Q_mean_reg <- apply(array(unlist(final_coefs_aic), c(1,4,n_imputations*n_bootstraps))[1,,], 1, mean) # Q_mean_reg contains the coefficients from the model
+U_mean_reg <- diag(apply(array(unlist(final_vars_aic), c(4,4,n_imputations*n_bootstraps)), 1:2, mean)) # U the within-imputation variability i.e. the mean of the squared standard errors within the imputed data sets
+B_var_reg <- apply(array(unlist(final_coefs_aic), c(1,4,n_imputations*n_bootstraps))[1,,], 1, var) # B the between-imputation variability caused by the differences in imputed values across the data sets
+# B_var_reg <-  apply((Q_mean_reg - array(unlist(final_coefs_aic), c(1,20,n_imputations*n_bootstraps))[1,,])^2, 1, sum)/ (n_imputations*n_bootstraps - 1) # B the between-imputation variability caused by the differences in imputed values across the data sets
+T_var_reg <- sqrt(U_mean_reg + (1 + 1/(n_imputations*n_bootstraps))*B_var_reg) # The overall variance T associated with Q
+lower_ci_reg <- Q_mean_reg - 1.96*T_var_reg
+upper_ci_reg <- Q_mean_reg + 1.96*T_var_reg
+z <- Q_mean_reg/T_var_reg
+p <- (1 - pnorm(abs(z), 0, 1)) * 2 # 2-tailed z test
+
+Q_mean_reg #Q_mean_reg contains the coefficients from the model
+T_var_reg #T_var_reg contains the standard errors from the model
+lower_ci_reg #lower limits of 95% CIs
+upper_ci_reg #upper limits of 95% CIs
+p #2-tailed p value
+
+result_pool_aic <- rbind(Q_mean_reg, T_var_reg, lower_ci_reg, upper_ci_reg, p) %>% data.frame()
+result_pool_aic <- t(result_pool_aic)
+rownames(result_pool_aic) <- final_variables_aic[[1]]
+colnames(result_pool_aic) <- c("Coef.", "Std.Error", "Lower CI", "Upper CI", "P_value")
+result_pool_aic
+
+###Pool MI using Rubin's rules - ROC & Brier
+roc1p_aic <- mean(array(unlist(as.numeric(roc1_aic$auc)), c(1,1,n_imputations*n_bootstraps))[1,,])
+brier1p_aic <- mean(array(unlist(brier1_aic), c(1,1,n_imputations*n_bootstraps))[1,,])
+
+# Save results for later use
+save(selected_variables_aic, results_list_aic, result_pool_aic, roc1p_aic, brier1p_aic, file="AIC_results.RData")
+```
+
+# Model display - AIC
+
+```{r, message=FALSE, warning=FALSE}
+# Model display ------------------------
+library(mice)
+library(rms)
+#################### do this on stacked MI data
+# Set seed for reproducibility
+set.seed(1234)
+# Set the number of imputations and bootstraps
+# n_imputations <- 50
+# imp <- mice(data, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+# data.imp.long <- complete(imp, "long", include = F)
+
+dd <- datadist(data.imp.long); options(datadist = 'dd')
+f <- rms::lrm(outcome2 ~ age + clini_score + NEU_LYM, data = na.omit(data.imp.long), x=TRUE,y=TRUE)
+
+car::vif(f)
+
+f <- Newlabels(f, c("Age, years", "Clinical score", "Neutrophil/Lymphocyte ratio"))
+
+# png(file = "../figures/nomogram-aic.png", width = 1600, height = 800)
+plot(nomogram(fit = f, lp = F, 
+              varname.label=TRUE, varname.label.sep="=",
+              fun = plogis, 
+              fun.at=c(.05 ,.1 ,.2 ,.3 ,.4 ,.5 ,.6 ,.7 ,.8 ,.9 ,.95 ),
+              funlabel="Risk of Death"))
+# dev.off()
+```
+
+## Validating fitted models - AIC
+
+```{r}
+(val <- validate(f, B = 200))
+(c_opt_corr <- 0.5 * (val[1, 5] + 1))
+```
+
+```{r}
+cal <- rms::calibrate(f, B = 200)
+# png(file = "../figures/cal_aic.png", width = 600, height = 500)
+plot(cal, cex.axis=1, cex=0.8)
+# dev.off()
+```
+
+## Plotting mean ROC curve for multiple ROC curves - AIC
+
+```{r, message=FALSE, warning=FALSE}
+# Unlist results ROC
+results_list_aic |> unlist(recursive = F) |> purrr::transpose() -> .
+roc1_aic <- .$roc1 |> purrr::transpose()
+roc1_aic |> unlist(recursive = F) -> .
+
+PredictionValues <- roc1_aic$predictor |> unlist() 
+RealClass <- roc1_aic$response %>% unlist()
+
+sampledList <- lapply(seq_along(roc1_aic$predictor), function(i) {
+  setNames(roc1_aic$predictor[[i]], paste(i, seq_along(roc1_aic$predictor[[i]]), sep = "."))
+})
+Sample <- lapply(seq_along(sampledList), function(i) {as.numeric(gsub("\\..*", "", names(sampledList[[i]])))}) %>% unlist()
+
+sensitivity <- roc1_aic$sensitivities %>% unlist()
+specificity <- roc1_aic$specificities %>% unlist()
+thresholds <- roc1_aic$thresholds %>% unlist()
+
+predictions_all_samples <- data.frame(
+    Sample = Sample,
+    PredictionValues = PredictionValues,
+    RealClass = RealClass
+)
+
+library(cutpointr)
+library(tidyverse)
+mean_roc <- function(data, cutoffs = seq(from = 0, to = 1, by = 0.05)) {
+    map_df(cutoffs, function(cp) {
+        out <- cutpointr(data = data, x = PredictionValues, class = RealClass,
+                         subgroup = Sample, method = oc_manual, cutpoint = cp,
+                         pos_class = "Bad outcome", direction = ">=")
+        data.frame(cutoff = cp, 
+                   sensitivity = mean(out$sensitivity),
+                   specificity = mean(out$specificity))
+    })
+}
+
+mr <- mean_roc(predictions_all_samples)
+
+ggplot(mr, aes(x = 1 - specificity, y = sensitivity)) + 
+    geom_step() + geom_point() +
+    theme(aspect.ratio = 1)
+
+# plot the separate ROC curves and the added mean ROC curve with cutpointr:
+# png(file = "../figures/roc_aic.png", width = 600, height = 500)
+cutpointr(data = predictions_all_samples, 
+          x = PredictionValues, class = RealClass, subgroup = Sample,
+          pos_class = "Bad outcome", direction = ">=") %>%
+  plot_roc(display_cutpoint = T) + theme(legend.position="none") +
+  geom_line(data = mr, mapping = aes(x = 1 - specificity, y = sensitivity), color = "black") +
+  annotate("text", x=0.2, y=0.9, label=paste("Mean AUC", round(roc1p_aic, 3), sep = "="), size=4) +
+  annotate("text", x=0.2, y=0.85, label=paste("Mean Brier score", round(brier1p_aic, 3), sep = "="), size=4)
+# dev.off()
+```
+
+## Best combinations of predictors
+
+```{r, message=FALSE, warning=FALSE}
+library(MuMIn) # for best subset selection
+
+# EPV --------------------------------------------------------------
+pred <- c("age", "bmi", "DUR", "TBTreatedBefore", "DM", "PatientHIV", "Regimen", "anemia", "clini_score", "Timika.score", "CT_mean", "NEU_LYM", "ALB")
+
+# Estimate full model ----------------------------------------------
+full_mod <- glm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, 
+                family=binomial, data=data.comp, x=T, y=T, na.action = "na.fail")
+
+# Selected model ---------------------------------------------------
+sel_var <- matrix(0, ncol=length(pred)+1, nrow=8, dimnames=list(NULL, c(pred, "aic")))
+
+options(na.action = "na.fail") # for 'dredge' function [MuMIn]
+for (i in 1:8) {
+  if (i==1) {
+    bs <- dredge(full_mod, rank="AIC")
+  } else {
+    bs <- dredge(full_mod, rank="AIC", m.lim=c(i,i))
+  }
+  bs_var <- attr(get.models(bs, 1)[[1]]$terms, "term.labels")
+
+  for (j in 1:(ncol(sel_var)-1)) {sel_var[i,j] <- ifelse(names(sel_var[i,j]) %in% bs_var, 1, 0)}
+  formula <- paste("outcome2~", paste(names(sel_var[i,][sel_var[i,]==1]), collapse = "+"))
+  sel_mod <- glm(formula, data = data.comp, family = binomial, x = T, y = T)
+  sel_var[i, ncol(sel_var)] <- AIC(sel_mod)
+}
+
+# Report results --------------------------------------------------
+out1 <- as.data.frame(sel_var) %>% mutate(AIC = round(aic,1)) %>% select(-aic)
+for (i in 1:(ncol(out1)-1)) {out1[,i] <- ifelse(out1[,i]==0, NA, "+")}
+
+out2 <- as.data.frame(t(out1))
+colnames(out2) <- c("Best of all combinations", "Best combination of 2 variables", "Best combination of 3 variables",
+                    "Best combination of 4 variables", "Best combination of 5 variables", "Best combination of 6 variables", "Best combination of 7 variables", "Best combination of 8 variables")
+rownames(out2) <- c("- Age", "- BMI", "- DUR", "- TBTreatedBefore", "- Diabetes", "- PatientHIV", "- Regimen", "- Anemia", "- Clini_score", "- Timika score", "- CT_mean", "- NEU/LYM ratio", "- Albumin", "AIC of the selected model")
+
+library(kableExtra)
+kbl(out2) %>% kable_styling()
+
+# For bootstrap results please look at Appendix 7-tables 1, 2 (for the best of all combinations)
+# and the bootstrap codes for the best combinations of 2, 3, 4, and 5 variables
+```
+
+```{r}
+# Split the data into training and test set
+set.seed(123)
+training.samples <- data.comp$outcome2 %>% 
+  createDataPartition(p = 0.8, list = FALSE)
+train.data  <- data.comp[training.samples, ]
+test.data <- data.comp[-training.samples, ]
+
+table(data.comp$outcome2)
+
+# Fit full logistic model with best combinations
+full_model <- glm(outcome2~age+bmi+TBTreatedBefore+DM+PatientHIV+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, 
+                family=binomial, data=train.data)
+
+# Make predictions
+probabilities.LR <- full_model %>% predict(test.data, type = "response")
+predicted.classes.LR <- ifelse(probabilities.LR > 0.5, "Bad outcome", "Good outcome")
+# Model accuracy
+observed.classes.LR <- test.data$outcome2
+mean(predicted.classes.LR == observed.classes.LR)
+
+par(pty="s")
+roc1<-pROC::roc(observed.classes, as.vector(preds), percent=T, plot=TRUE, grid=TRUE, ci=TRUE, legacy.axes = TRUE, xlab="False Positive Percentage", ylab="True Positive Percentage", col="#E31A1C", print.auc.x=92, print.auc.y=90, print.auc = TRUE, print.auc.cex=1.25, lwd=3, cex.lab=1.5, cex.axis=1.5)
+
+roc2<-plot.roc(test.data$outcome2, as.vector(probabilities.LR), percent=T, grid=TRUE, ci=TRUE, col="#377eb8", add=TRUE, print.auc.x=80, print.auc.y=75, print.auc = TRUE, print.auc.cex=1.25, lwd=3, cex.lab=1.5, cex.axis=1.5)
+
+legend("bottomright", legend=c("Lasso regression", "Logistic regression"), col=c("#E31A1C", "#377eb8"), lwd=3, cex=1.25)
+par(pty="m")
+```
+
+### Bootstrap for best subset
+
+```{r, eval=FALSE}
+# Initial setup
+
+pred <- c("age", "bmi", "DUR", "TBTreatedBefore", "DM", "PatientHIV", "Regimen", "anemia", "clini_score", "Timika.score", "CT_mean", "NEU_LYM", "ALB")
+full_mod <- glm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, 
+                family=binomial, data=data.comp, x=T, y=T)
+full_est <- coef(full_mod)
+pred_name <- names(full_est)[-1]
+bootnum <- 10
+
+set.seed(51086)
+
+#----------------------------------------------------------------------------------------------------
+# Bootstrap for best of all combinations for adults
+
+boot_vara <- matrix(0, ncol = length(pred) + 1, nrow = bootnum, dimnames = list(NULL, c(pred, "aic")))
+boot_esta <-  boot_sea <- matrix(0, ncol = length(pred_name) + 1, nrow = bootnum,
+                               dimnames = list(NULL, c("(Intercept)", pred_name)))
+
+for (i in 1:bootnum) {
+  data_id <- sample(1:dim(data.comp)[1], replace = T)
+  dat_id <- data.comp[data_id, ]
+  boot_m <- glm(outcome2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+anemia+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, 
+                family=binomial, data=dat_id, x=T, y=T)
+  boot_seal <- dredge(boot_m, rank="AIC")
+  boot_vara_tmp <- attr(get.models(boot_seal, 1)[[1]]$terms, "term.labels")
+  
+  for (j in 1:(ncol(boot_vara)-1)) {
+    boot_vara[i,j] <- ifelse(names(boot_vara[i,j]) %in% boot_vara_tmp, 1, 0)
+  }
+  
+  formula <- paste("outcome2~", paste(names(boot_vara[i,][boot_vara[i,]==1]), collapse = "+"))
+  boot_mod <- glm(formula, data = dat_id, family = binomial, x = T, y = T)
+  boot_vara[i, ncol(boot_vara)] <- AIC(boot_mod)
+  boot_esta[i, names(coef(boot_mod))] <- coef(boot_mod)
+  boot_sea[i, names(coef(boot_mod))] <- coef(summary(boot_mod))[, "Std. Error"]
+}
+
+# Save bootstrap results for later use
+
+#save(boot_vara, boot_esta, boot_sea, file="bootstrap_results.RData")
+```
+
+# Secondary analysis
+
+```{r}
+sputum <- sputum_clean %>% 
+  dplyr::select(studycode, EnrolledDAT, Regimen, STDAT, DateComplete, DateLastASS, DateLastALIVE, OUT, DateDeath, DateLastFU, Last_Culture_conversion, last_time_convert, Culture_conversion, Time, follow_up_timepoint, First_conversion, age, gender, occupation, outcome, outcome2, DUR, TEMP, SYSBP, DIABP, TBTreatedBefore, BCGVaccinated, PatientHIV, Diabetes, Smoking, Over15AlcoholUnits, WBC, NEUTLE, LYMLE, MONOLE, PLAT, FASTGLUC, HbA1C, ALB, GLO, genotype, D2, D3, MDR_TB, DM, GenXpert, Cavity, Timika.score, bmi, lineage, TNF, IL6, IFN, CT_mean, clini_score) %>%
+  mutate(time=as.numeric(last_time_convert),
+         time=ifelse((is.na(time) & (Regimen=="6M")), 180,
+                     ifelse((is.na(time) & (Regimen=="8M")), 240,
+                            ifelse((is.na(time) & (Regimen=="9M")), 365,
+                                   ifelse((is.na(time) & (Regimen=="20M")), 730, time)))),
+         time_first = NA,
+         time_first = ifelse(First_conversion=="Culture.N14", 14,
+                             ifelse(First_conversion=="Culture.T01", 30,
+                                    ifelse(First_conversion=="Culture.T02", 60,
+                                           ifelse(First_conversion=="Culture.T03", 90,
+                                                  ifelse(First_conversion=="Culture.T04", 120,
+                                                         ifelse(First_conversion=="Culture.T05", 150,
+                                                                ifelse(First_conversion=="Culture.T06", 180,
+                                                                       ifelse(First_conversion=="Culture.T07", 210,
+                                                                              ifelse(First_conversion=="Culture.T08", 240,
+                                                                                     time_first))))))))),
+         EnrolledDAT = as.Date(EnrolledDAT, format="%Y/%m/%d"),
+         DateDeath = as.Date(DateDeath, format="%Y/%m/%d"),
+         DateLastFU = as.Date(DateLastFU, format="%Y/%m/%d"),
+         StartDate = EnrolledDAT,
+         EndDate = NA,
+         EndDate = ifelse(Regimen=="6M", pmin(EnrolledDAT + days(180), DateLastFU, DateDeath, na.rm=TRUE), 
+                          ifelse(Regimen=="8M", pmin(EnrolledDAT + days(240), DateLastFU, DateDeath, na.rm=TRUE), 
+                                 ifelse(Regimen=="9M", pmin(EnrolledDAT + days(365), DateLastFU, DateDeath, na.rm=TRUE), 
+                                        ifelse(Regimen=="20M", pmin(EnrolledDAT + days(730), DateLastFU, DateDeath, na.rm=TRUE),
+                                               EndDate)))),
+         EndDate = as.Date(EndDate, origin="1970-01-01"),
+         Time = difftime(EndDate, StartDate, units='days'),
+         Event = case_when(
+           outcome=="Died" ~ 2,
+           outcome=="Failed" ~ 1,
+           outcome=="Completed" ~ 0,
+           outcome=="Cured" ~ 0,
+           TRUE ~ 0
+         ),
+         time_first_all = NA,
+         time_first_all = ifelse(!is.na(time_first), time_first, as.numeric(Time)),
+         Event_first = case_when(
+           !is.na(time_first) ~ 1,
+           !is.na(DateDeath) ~ 2,
+           !is.na(DateLastFU) ~ 0,
+           TRUE ~ 0
+         ),
+         status=NA,
+         status=case_when(Culture_conversion=="censor" ~ 0,
+                          Last_Culture_conversion=="censor" ~ 0,
+                          (!is.na(Culture_conversion) & Culture_conversion!="censor") ~ 1,
+                          TRUE ~ NA_real_),
+         status=factor(status, levels = c(0,1), labels = c("censor", "conversion")),
+         status2=ifelse(outcome=="Died", 2, ifelse(status=="conversion", 1, 0)),
+         status2=factor(status2, levels = c(0,1,2), labels = c("censor", "conversion", "died")))
+```
+
+## Competing risks
+
+```{r Time_First Conversion_CompRisk}
+library(survival)
+library(survminer)
+
+data.FirstConverse <- finegray(Surv(as.numeric(time_first_all), Event_first, type="mstate")~. + strata(Regimen), sputum)
+prob.FirstConverse <- survfit(Surv(fgstart,fgstop,fgstatus)~Regimen, data=data.FirstConverse, weights=fgwt)
+logrank <- pchisq(coxph(Surv(fgstart,fgstop,fgstatus)~Regimen, data=data.FirstConverse, weights=fgwt)$score, df=1, lower.tail=FALSE)
+
+FG.FirstConverse <- coxph(Surv(fgstart,fgstop,fgstatus)~Regimen, data.FirstConverse,weights=fgwt)
+FirstConverse <- ggsurvplot(prob.FirstConverse, fun="event",
+           legend=c(0.6,0.2), xlab="time since treatment (weeks)", font.x=c(13,"plain","black"), font.y=c(13,"plain","black"), font.legend=c(11,"plain","black"), font.tickslab=c(11,"plain","black"), legend.title="Regimen", legend.labs=c("Regimen 20M", "Regimen 6M", "Regimen 8M", "Regimen 9M"), 
+           pval=paste0("p-value=",bquote(.(formatC(as.numeric(logrank),20,format="f")))), pval.coord=c(365,0.6), pval.size=4, ylab="Probability (first conversion)", break.time.by=28,  censor=FALSE, conf.int=TRUE,
+           title="Time to First conversion", ggtheme = theme_bw(), xlim=c(0,730), ylim=c(0,1), surv.scale="percent", xscale=7)
+
+FirstConverse
+ggsave("FirstConverse.png", width = 7, height = 5)
+```
+
+```{r}
+data2 <- sputum %>%
+  mutate(NEU_LYM = NEUTLE/LYMLE,
+         Smoking=ifelse(Smoking=="Never", 0, ifelse(Smoking=="Ex-Smoker", 1, 2)),
+         Smoking=factor(Smoking, levels = c(0,1,2), labels = c("Never", "Ex-Smoker", "Current Smoker")),
+         PatientHIV=na_if(PatientHIV, "Not sure"),
+         PatientHIV=ifelse(PatientHIV=="Negative", 0, 1),
+         PatientHIV=factor(PatientHIV, levels = c(0,1), labels = c("Negative", "Positive")),
+         DM=na_if(DM, "Unknown"),
+         DM=ifelse(DM=="No diabetes", 0, 1),
+         DM=factor(DM, levels = c(0,1), labels = c("No diabetes", "Diabetes/Prediabetes"))) %>%
+  dplyr::select(c(age, gender, bmi, DUR, TBTreatedBefore, DM, PatientHIV, Regimen, clini_score, Timika.score, CT_mean, NEU_LYM, ALB, time_first_all, Event_first)) %>% filter(Event_first %in% c(0,1))
+```
+
+```{r, results='hide'}
+diagnose(data2) %>% flextable()
+diagnose_category(data2) %>% flextable()
+diagnose_numeric(data2) %>% flextable()
+diagnose_outlier(data2) %>% flextable()
+```
+
+# Characteristics of participants
+
+```{r, warning=FALSE, message=FALSE}
+library(gtsummary)
+library(forcats)
+
+table3 <- data2 %>% dplyr::select(age, gender, bmi, DUR, TBTreatedBefore, DM, PatientHIV, Regimen, clini_score, Timika.score, CT_mean, NEU_LYM, ALB, time_first_all, Event_first)
+
+t3 <- table3 %>% 
+  tbl_summary(
+    by = Event_first, # split table by group
+    percent = "col",
+    missing = "no", # don't list missing data separately,
+    label = list(age = "Age",
+                 gender = "Sex"),
+    statistic = list(all_continuous() ~ "{median} ({IQR})",
+                     all_categorical() ~ "{n} ({p}%)")
+  ) %>%
+  add_n() %>% # add column with total number of non-missing observations
+  #add_p(pvalue_fun=~style_pvalue(.x,digits=2)) %>% # test for a difference between groups
+  modify_header(label = "**Variable**") %>% # update the column header
+  bold_labels()
+t3
+```
+
+```{r GGallySolution1, message=FALSE, warning=FALSE, eval=TRUE}
+library(GGally)
+ggpairs(select(data2, age, bmi, time_first_all, DUR, clini_score, Timika.score, CT_mean, NEU_LYM, ALB)) 
+```
+
+## Imputation diagnostic checking
+
+```{r, message=FALSE, warning=FALSE}
+library(mice)
+library(VIM)
+# png(file = "../figures/vim.png", width = 1600, height = 800)
+aggr(data2, plot = T, prop = T, numbers = F, combined = F, sortVars = T, cex.axis=0.8, gap=1, oma = c(8,3,3,2))
+# dev.off()
+```
+
+# Full model
+
+```{r, message=FALSE, warning=FALSE}
+library(mice)
+library(caret)
+library(DescTools)
+# Fit the final model with the selected variables
+# formula <- as.formula(paste("status ~", paste(selected_variables, collapse = " + ")))
+# final_model <- glm(formula, data = data_imputed, family = binomial())
+library(future)
+library(parallel)
+# detectCores()
+# registerDoParallel(6)
+plan(sequential)
+plan(multisession, workers=3)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+n_bootstraps <- 20
+
+# Create a list to store the results for each imputed dataset
+results_list_full <- vector("list", n_imputations)
+# Impute the missing values
+imp <- mice(data2, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+
+# Loop over the imputations
+for (i in 1:n_imputations) {
+  
+    #Make a complete dataset of imputation in long format and remove NA
+  data_imputed <- complete(imp, action=i, include = F)
+  
+  # Create a list to store the results for each bootstrap
+  results_boot_full<- vector("list", n_bootstraps)
+  
+  # Loop over the bootstraps
+  for (j in 1:n_bootstraps) {
+    results_boot_full[[j]] <- future({
+    # Create the bootstrap sample
+    index <- sample(1:dim(data_imputed)[1], replace = T)
+    data_boot <- data_imputed[index, ]
+    
+    set.seed(123)
+    training.samples <- data_boot$Event_first %>%
+      createDataPartition(p=0.7, list = FALSE)
+    train.data <- data_boot[training.samples, ] %>% na.omit()
+    test.data <- data_boot[-training.samples, ] %>% na.omit()
+    
+    # Fit model and make predictions
+    full.model <- eventglm::cumincglm(Surv(time_first_all, Event_first) ~ Regimen + age + gender + bmi + DUR + TBTreatedBefore + DM + PatientHIV + clini_score + Timika.score + CT_mean + NEU_LYM + ALB, time = 730, 
+                           data = train.data, model.censoring = "coxph", 
+                           formula.censoring = ~ Regimen + age + gender + bmi + DUR + TBTreatedBefore + DM + PatientHIV + clini_score + Timika.score + CT_mean + NEU_LYM + ALB)
+    
+    probabilities.FULL <- full.model %>% predict(test.data, type = "response")
+    predicted.classes.FULL <- ifelse(probabilities.FULL > 0.5, "failure", "censor")
+    
+    # Model accuracy
+    observed.classes.FULL <- test.data$Event_first
+    mean(predicted.classes.FULL == observed.classes.FULL)
+    
+    # Store the final variables and their coefficients
+    final_variables <- names(full.model$coefficients)
+    final_coefs <- coef(full.model)
+    final_vars <- vcov(full.model)
+    roc1 <- pROC::roc(observed.classes.FULL, as.vector(probabilities.FULL))
+    brier1 <- DescTools::BrierScore(full.model)
+    
+    # Store the results for this bootstrap
+    list(final_variables = final_variables,
+                              final_coefs = final_coefs,
+                              final_vars = final_vars,
+                              roc1 = roc1,
+                              brier1 = brier1)
+  }, gc=T, seed=T)
+  cat(j)
+  }
+  # Combine the results for all bootstraps for this imputed dataset
+  results_list_full[[i]] <- lapply(results_boot_full, value)
+  
+}
+
+# Unlist results
+results_list_full |> unlist(recursive = F) |> purrr::transpose() -> .
+final_coefs_full <- .$final_coefs
+final_vars_full <- .$final_vars
+final_variables_full <- .$final_variables
+roc1_full <- .$roc1 |> purrr::transpose()
+brier1_full <- .$brier1
+
+###Pool MI using Rubin's rules
+Q_mean_reg <- apply(array(unlist(final_coefs_full), c(1,16,n_imputations*n_bootstraps))[1,,], 1, mean) # Q_mean_reg contains the coefficients from the model
+U_mean_reg <- diag(apply(array(unlist(final_vars_full), c(16,16,n_imputations*n_bootstraps)), 1:2, mean)) # U the within-imputation variability i.e. the mean of the squared standard errors within the imputed data sets
+B_var_reg <- apply(array(unlist(final_coefs_full), c(1,16,n_imputations*n_bootstraps))[1,,], 1, var) # B the between-imputation variability caused by the differences in imputed values across the data sets
+# B_var_reg <-  apply((Q_mean_reg - array(unlist(final_coefs_aic), c(1,20,n_imputations*n_bootstraps))[1,,])^2, 1, sum)/ (n_imputations*n_bootstraps - 1) # B the between-imputation variability caused by the differences in imputed values across the data sets
+T_var_reg <- sqrt(U_mean_reg + (1 + 1/(n_imputations*n_bootstraps))*B_var_reg) # The overall variance T associated with Q
+lower_ci_reg <- Q_mean_reg - 1.96*T_var_reg
+upper_ci_reg <- Q_mean_reg + 1.96*T_var_reg
+z <- Q_mean_reg/T_var_reg
+p <- (1 - pnorm(abs(z), 0, 1)) * 2 # 2-tailed z test
+
+Q_mean_reg #Q_mean_reg contains the coefficients from the model
+T_var_reg #T_var_reg contains the standard errors from the model
+lower_ci_reg #lower limits of 95% CIs
+upper_ci_reg #upper limits of 95% CIs
+p #2-tailed p value
+
+result_pool_full <- rbind(Q_mean_reg, T_var_reg, lower_ci_reg, upper_ci_reg, p) %>% data.frame()
+result_pool_full <- t(result_pool_full)
+rownames(result_pool_full) <- final_variables_full[[1]]
+colnames(result_pool_full) <- c("Coef.", "Std.Error", "Lower CI", "Upper CI", "P_value")
+result_pool_full
+
+###Pool MI using Rubin's rules - ROC & Brier
+roc1p_full <- mean(array(unlist(as.numeric(roc1_full$auc)), c(1,1,n_imputations*n_bootstraps))[1,,])
+brier1p_full <- mean(array(unlist(brier1_full), c(1,1,n_imputations*n_bootstraps))[1,,])
+
+# Save results for later use
+save(results_list_full, result_pool_full, roc1p_full, brier1p_full, file="FULL_surv_results.RData")
+```
+
+# Model display - FULL
+
+```{r, message=FALSE, warning=FALSE}
+# Model display ------------------------
+library(mice)
+library(rms)
+library(car)
+#################### do this on stacked MI data
+# Set seed for reproducibility
+set.seed(1234)
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+imp <- mice(data2, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+data.imp.long2 <- complete(imp, "long", include = F)
+
+dd <- datadist(data.imp.long2); options(datadist = 'dd')
+f <- rms::lrm(status2 ~ Regimen + age + gender + bmi + DUR + TBTreatedBefore + DM + PatientHIV + clini_score + Timika.score + CT_mean + NEU_LYM + ALB, data = na.omit(data.imp.long2), x=TRUE,y=TRUE)
+
+car::vif(f)
+
+f <- Newlabels(f, c("Regimen", "Age, years", "Gender", "BMI, kg/m\u00B2", "Duration of illness", "TB treatment before", "Diabetes", "HIV positive", "Clinical score", "Timika score", "CT mean", "Neutrophil/Lymphocyte ratio", "Albumin"))
+
+# ss <-  c(.05 ,.1 ,.2 ,.3 ,.4 ,.5 ,.6 ,.7 ,.8 ,.9 ,.95 )
+
+plot(nomogram(fit = f, lp = F, 
+              vnames="labels",
+              varname.label=TRUE, varname.label.sep="=",
+              fun = plogis, 
+              fun.at=c(.001,.01,.05,seq(.1,.9,by=.1),.95,.99,.999),
+              funlabel="Risk of treatment failure"))
+
+save(data, data.imp.long, file="data.RData")
+```
+
+### Validating fitted models with rms::validate() and rms:calibrate()
+
+```{r}
+(val <- validate(f, B = 200))
+(c_opt_corr <- 0.5 * (val[1, 5] + 1))
+```
+
+```{r}
+cal <- rms::calibrate(f, B = 200)
+plot(cal)
+
+set.seed(13032023)
+val_new <- rms::validate(f, B = 200)
+  
+shrink_factor <- round(val_new["Slope","index.corrected"], 2)
+c_corrected <- round(0.5 * (1 + val_new["Dxy","index.corrected"]), 2)
+```
+
+# Plotting mean ROC curve for multiple ROC curves - FULL
+
+```{r, message=FALSE, warning=FALSE}
+# Unlist results ROC
+results_list_full |> unlist(recursive = F) |> purrr::transpose() -> .
+roc1_full <- .$roc1 |> purrr::transpose()
+roc1_full |> unlist(recursive = F) -> .
+
+PredictionValues <- roc1_full$predictor |> unlist() 
+RealClass <- roc1_full$response %>% unlist()
+
+sampledList <- lapply(seq_along(roc1_full$predictor), function(i) {
+  setNames(roc1_full$predictor[[i]], paste(i, seq_along(roc1_full$predictor[[i]]), sep = "."))
+})
+Sample <- lapply(seq_along(sampledList), function(i) {as.numeric(gsub("\\..*", "", names(sampledList[[i]])))}) %>% unlist()
+
+sensitivity <- roc1_full$sensitivities %>% unlist()
+specificity <- roc1_full$specificities %>% unlist()
+thresholds <- roc1_full$thresholds %>% unlist()
+
+predictions_all_samples <- data.frame(
+    Sample = Sample,
+    PredictionValues = PredictionValues,
+    RealClass = RealClass
+)
+
+library(cutpointr)
+library(tidyverse)
+mean_roc <- function(data, cutoffs = seq(from = 0, to = 1, by = 0.05)) {
+    map_df(cutoffs, function(cp) {
+        out <- cutpointr(data = data, x = PredictionValues, class = RealClass,
+                         subgroup = Sample, method = oc_manual, cutpoint = cp,
+                         pos_class = "failure", direction = ">=")
+        data.frame(cutoff = cp, 
+                   sensitivity = mean(out$sensitivity),
+                   specificity = mean(out$specificity))
+    })
+}
+
+mr <- mean_roc(predictions_all_samples)
+
+ggplot(mr, aes(x = 1 - specificity, y = sensitivity)) + 
+    geom_step() + geom_point() +
+    theme(aspect.ratio = 1)
+
+# plot the separate ROC curves and the added mean ROC curve with cutpointr:
+# png(file = "../figures/roc_full.png", width = 600, height = 500)
+cutpointr(data = predictions_all_samples, 
+          x = PredictionValues, class = RealClass, subgroup = Sample,
+          pos_class = "failure", direction = ">=") %>%
+  plot_roc(display_cutpoint = T) + theme(legend.position="none") +
+  geom_line(data = mr, mapping = aes(x = 1 - specificity, y = sensitivity), color = "black") +
+  annotate("text", x=0.2, y=0.9, label=paste("Mean AUC", round(roc1p_full, 3), sep = "="), size=4) +
+  annotate("text", x=0.2, y=0.85, label=paste("Mean Brier score", round(brier1p_full, 3), sep = "="), size=4)
+# dev.off()
+```
+
+## Pseudo-observations
+
+```{r, message=FALSE, warning=FALSE}
+library(survival)
+#install.packages("eventglm")
+library(eventglm)
+options(na.action = "na.exclude")
+```
+
+The main interest is in comparing the distributions of time to conversion between the 4 treatment regimens. Let’s start with a survival curve.
+
+```{r}
+sfit_spu <- survfit(Surv(time, status) ~ Regimen, data = sputum)
+plot(sfit_spu, col = c("black", "slateblue", "salmon", "orange"), 
+     xlab = "days since registration", ylab = "survival")
+legend("bottomright", fill = c("black", "slateblue", "salmon", "orange"), 
+       legend = names(sfit_spu$strata))
+```
+
+As we know, hazard ratios are difficult to interpret as causal effects, even in randomized controlled trials. Better options for summarizing the effect of exposures are the survival at a particular time, or the restricted mean survival up to a given time. Let’s compare the survival at 1 year, or about 300 days since enrollment.
+
+In the figure above, we plot only the survival curve in the observation group. The vertical dotted line is at the time of interest (tmax = 300 days). The open point is at the estimated survival probability at time tmax, i.e., P(T>tmax) and the shaded area represents the restricted mean survival up to tmax, i.e., E{min(T,tmax)}=∫tmax0P(T>u)du. We can estimate these things using the survival package:
+
+
+```{r}
+sputum.sfit <- summary(sfit_spu, times = 300, rmean = 300)
+sputum.sfit
+```
+
+And we can now do inference using the eventglm package. First, we fit a regression model for the cumulative incidence, or 1 - survival:
+
+```{r}
+sputum <- sputum %>% filter(!is.na(time) & !is.na(status) & !is.na(Regimen))
+sputum.cifit <- eventglm::cumincglm(Surv(time, status) ~ Regimen, time = 300, data = sputum)
+summary(sputum.cifit)
+```
+
+```{r}
+se.ci <- sqrt(diag(vcov(sputum.cifit, type = "robust")))
+b.ci <- coefficients(sputum.cifit)
+conf.ci <- confint(sputum.cifit)
+se.ci
+b.ci
+conf.ci
+```
+
+We find that compared to 20M regimen, the 6M regimen group has a 0.36 difference in the cumulative incidence of death at 300 days, with 95% confidence interval 0.24, 0.47, while the 8M regimen has a 0.28 difference in the cumulative incidence of death at 300 days, with 95% confidence interval 0.14, 0.43. This roughly agrees with the Kaplan-Meier estimates from survfit above:
+
+```{r}
+cbind(eventglm = b.ci, 
+      survfit = c(1 - sputum.sfit$surv[1], 
+  (1 - sputum.sfit$surv[2:3]) - 
+    (1 - rep(sputum.sfit$surv[1], 2))))
+```
+We can fit another model using the log link to obtain estimates of the log relative risks comparing the active treatment arms to the observation arm:
+
+```{r}
+sputum.rr <- eventglm::cumincglm(Surv(time, status) ~ Regimen, time = 300, 
+                      data = sputum, link = "log")
+br.ci <- coefficients(sputum.rr)
+confr.ci <- confint(sputum.rr)
+```
+
+```{r}
+summary(sputum.rr)
+exp(br.ci)
+exp(confr.ci)
+```
+
+We find that the estimated probability of death before 300 days in the 6M regimen is 1.65 times higher compared to 20M regimen with 95% confidence interval 1.34, 2.03 and the estimated probability of death before 300 days in the 8M regimen is 1.52 times higher compared to observation with 95% confidence interval 1.20, 1.91. If odds ratios are of interest, then the link = "logit" option can be used instead. Another interesting option is the link = "cloglog": the complementary log log link for the cumulative incidence implies proportional hazards. Thus models using the cloglog link applied at various time points can be used to assess the proportional hazards assumption (Perme and Andersen 2008). Other options for link functions are probit, inverse, μ−2, square root, and users can define custom link function. It is not immediately clear what the interpretation of the regression coefficients would be in these cases, but they are possible. See the stats::family help file for more details.
+
+We can fit another multivariate model using the log link :
+
+```{r}
+sputum_mul.rr <- eventglm::cumincglm(Surv(time, status) ~ Regimen + age+gender+occupation, time = 300, 
+                      data = sputum, link = "log")
+br_mul.ci <- coefficients(sputum_mul.rr)
+confr_mul.ci <- confint(sputum_mul.rr)
+```
+
+```{r}
+summary(sputum_mul.rr)
+exp(br_mul.ci)
+exp(confr_mul.ci)
+```
+
+Now for the restricted mean:
+
+```{r}
+sputum.rmfit <- eventglm::rmeanglm(Surv(time, status) ~ Regimen, time = 300, data = sputum)
+summary(sputum.rmfit)
+```
+
+```{r}
+se.rm <- sqrt(diag(vcov(sputum.rmfit, type = "robust")))
+b.rm <- coefficients(sputum.rmfit)
+conf.rm <- confint(sputum.rmfit)
+b.rm
+conf.rm
+```
+
+We find that compared to 20M regimen, the 6M regimen group has a 109.3 difference in the mean time to conversion up to 300 days, with 95% confidence interval 83.4, 135.1, while the 8M regimen has a 79.0 difference in the mean time to conversion up to 300 days, with 95% confidence interval 45.2, 112.8. Again, this roughly agrees with the Kaplan-Meier estimates from survfit above:
+
+```{r}
+cbind(eventglm = b.rm, 
+      survfit = c(sputum.sfit$table[1, 3], 
+sputum.sfit$table[2:4, 3] - sputum.sfit$table[1, 3]))
+```
+
+A key advantage of the regression approach is that it gives us the ability to adjust or model other covariates. Several variables are associated with time to conversion, so in this case they would be called “precision variables.” We would expect that adjusting for age, or gender in the above models would reduce the standard error estimates of the treatment effects, without changing the coefficient estimates. Let’s find out:
+
+```{r}
+sputum.ci.adj <- eventglm::cumincglm(Surv(time, status) ~ Regimen + age + gender, time = 300, data = sputum)
+sputum.rm.adj <- eventglm::rmeanglm(Surv(time, status) ~ Regimen + age + gender, time = 300, data = sputum)
+summary(sputum.rm.adj)
+```
+
+The estimates don’t change (much) and the standard errors reduce by about 5%.
+
+Models for survival
+
+If you would like to model the survival which is equal to one minus the cumulative incidence, it is straightforward. You can simply use the survival = TRUE option:
+
+```{r}
+eventglm::cumincglm(Surv(time, status) ~ Regimen, time = 300, 
+                      data = sputum, survival = FALSE)
+```
+
+Multiple time points (New in version 1.2.0)
+
+Now you can specify a vector of times in cumincglm to get a model that assumes the effect of the covariate is constant over those times.
+
+```{r}
+mvtfit1_sputum <- eventglm::cumincglm(Surv(time, status) ~ Regimen, 
+        time = c(100, 200, 300, 400, 500),
+        data = sputum, survival = FALSE)
+summary(mvtfit1_sputum)
+```
+In this model, the intercept is the survival probability in the Obs arm at time 100 (the reference time). The terms labeled factor(pseudo.time)t represent the change in the intercept associated with the time t. So, for example, the probability of conversion in the 20M regimen at time 200 is 0.37 + 0.16 = 0.53.
+
+Looking at the survival curves in the figure above, the assumption of a constant treatment effect on the survival difference scale may be questionable. We can allow covariate effects to be time dependent by wrapping them in the special term tve() in the right side of the formula.
+
+```{r}
+mvtfit2_sputum <- eventglm::cumincglm(Surv(time, status) ~ tve(Regimen), 
+        time = c(100, 200, 300, 400, 500),
+        data = sputum, survival = FALSE)
+summary(mvtfit2_sputum)
+```
+
+Now the coefficients labeled factor(pseudo.time)t:Covariate represent the covariate effect at time t. So, for example, the difference in probabilities of conversion of 8M regimen to 20M regimen at time 300 is
+
+```{r}
+round(summary(mvtfit2_sputum)$coefficients[13,, drop = FALSE],2)
+```
+
+Compare with the estimate from survfit:
+
+```{r}
+round(summary(sfit_spu, times = 300)$surv[3] - 
+  summary(sfit_spu, times = 300)$surv[1], 2)
+```
+The key advantage of the regression approach is that we can adjust for covariates, do inference directly, and have more flexible models. The tve term allows you to have a mix of time-varying and time-constant effects. Just apply it to any covariate that you want to be time-varying.
+
+Censoring assumptions
+
+By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the model.censoring and formula.censoring options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates:
+
+```{r}
+sputum.ci.cen1 <- eventglm::cumincglm(Surv(time, status) ~ Regimen + age + gender, time = 300, 
+                           data = sputum, model.censoring = "stratified", 
+                           formula.censoring = ~ Regimen)
+sputum.ci.cen1
+```
+Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used (Overgaard, Parner, and Pedersen 2019). According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model.
+
+```{r}
+sputum.ci.cen2 <- eventglm::cumincglm(Surv(time, status) ~ Regimen + age + gender, time = 300, 
+                           data = sputum, model.censoring = "coxph", 
+                           formula.censoring = ~ Regimen + age + gender)
+sputum.ci.cen3 <- eventglm::cumincglm(Surv(time, status) ~ Regimen + age + gender, time = 300, 
+                           data = sputum, model.censoring = "aareg", 
+                           formula.censoring = ~ Regimen + age + gender)
+
+round(cbind("indep" = coef(sputum.ci.adj),
+  "strat" = coef(sputum.ci.cen1),
+  "coxipcw" = coef(sputum.ci.cen2),
+  "aalenipcw" = coef(sputum.ci.cen3)), 3)
+```
+In these models, the IPCW weights are returned in the element called “ipcw.weights.” If there are multiple time points, this will be a matrix with one column per time point.
+
+```{r}
+sputum.ci.cen2b <- eventglm::cumincglm(Surv(time, status) ~ Regimen + age + gender, 
+                            time = c(100, 200, 300), 
+                           data = sputum, model.censoring = "coxph", 
+                           formula.censoring = ~ Regimen + age + gender)
+sputum.ci.cen2b
+```
+
+```{r}
+head(sputum.ci.cen2b$ipcw.weights)
+```
+
+```{r}
+summary(sputum.ci.cen2b$ipcw.weights)
+```
+
+# Secondary analysis
+
+```{r, results='hide'}
+diagnose(sputum) %>% flextable()
+diagnose_category(sputum) %>% flextable()
+diagnose_numeric(sputum) %>% flextable()
+diagnose_outlier(sputum) %>% flextable()
+```
+
+# Characteristics of participants
+
+```{r, warning=FALSE, message=FALSE}
+library(gtsummary)
+library(forcats)
+
+table2 <- sputum %>% dplyr::select(age, gender, DUR, TEMP, SYSBP, DIABP, TBTreatedBefore, BCGVaccinated, PatientHIV, DM, WBC, NEUTLE, LYMLE, MONOLE, FASTGLUC, HbA1C, ALB, Cavity, Timika.score, bmi, TNF, IL6, CT_mean, clini_score, Regimen, time, outcome, outcome2, status, status2)
+
+t2 <- table2 %>% 
+  tbl_summary(
+    by = status2, # split table by group
+    percent = "col",
+    missing = "no", # don't list missing data separately,
+    label = list(age = "Age",
+                 gender = "Sex"),
+    statistic = list(all_continuous() ~ "{median} ({IQR})",
+                     all_categorical() ~ "{n} ({p}%)")
+  ) %>%
+  add_n() %>% # add column with total number of non-missing observations
+  #add_p(pvalue_fun=~style_pvalue(.x,digits=2)) %>% # test for a difference between groups
+  modify_header(label = "**Variable**") %>% # update the column header
+  bold_labels()
+t2
+```
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+library(glmnet)
+library(caret)
+library(MLeval)
+library(ranger)
+library(mice)
+
+# Load the data with predictors, outcome
+`%notin%` <- Negate(`%in%`)
+
+data2 <- dat %>%
+  mutate(NEU_LYM = NEUTLE/LYMLE,
+         Smoking=ifelse(Smoking=="Never", 0, ifelse(Smoking=="Ex-Smoker", 1, 2)),
+         Smoking=factor(Smoking, levels = c(0,1,2), labels = c("Never", "Ex-Smoker", "Current Smoker")),
+         PatientHIV=na_if(PatientHIV, "Not sure"),
+         PatientHIV=ifelse(PatientHIV=="Negative", 0, 1),
+         PatientHIV=factor(PatientHIV, levels = c(0,1), labels = c("Negative", "Positive")),
+         DM=na_if(DM, "Unknown"),
+         DM=ifelse(DM=="No diabetes", 0, 1),
+         DM=factor(DM, levels = c(0,1), labels = c("No diabetes", "Diabetes/Prediabetes")),
+         time=reversion_date,
+         time=ifelse(outcome=="Died", as.Date(DateDeath,format="%m/%d/%Y") - as.Date(date.N0,format="%m/%d/%Y"), time),
+         time=ifelse(is.na(time), 810, time),
+         status2=ifelse((reversion=="No" | reversion=="censor"), 0, 1),
+         status2=ifelse(outcome=="Died", 1, status2),
+         status2=factor(status2, levels = c(0,1), labels = c("censor", "failure")),
+         status3=status2,
+         status3=ifelse(outcome=="Died", 2, ifelse(status2=="reversion", 1, 0)),
+         status3=factor(status3, levels = c(0,1,2), labels = c("censor", "reversion", "died"))) %>%
+  dplyr::select(c(age, gender, bmi, DUR, TBTreatedBefore, DM, PatientHIV, Regimen, clini_score, Timika.score, CT_mean, NEU_LYM, ALB, reversion, time, status2, status3))
+
+data2_noNA <- data2 %>% na.omit()
+  
+
+# Inspect the data
+# Inspect the data
+sample_n(data2, 20)
+```
+
+```{r, results='hide'}
+diagnose(data2) %>% flextable()
+diagnose_category(data2) %>% flextable()
+diagnose_numeric(data2) %>% flextable()
+diagnose_outlier(data2) %>% flextable()
+```
+
+# Characteristics of participants
+
+```{r, warning=FALSE, message=FALSE}
+library(gtsummary)
+library(forcats)
+
+table3 <- data2 %>% dplyr::select(age, gender, bmi, DUR, TBTreatedBefore, DM, PatientHIV, Regimen, clini_score, Timika.score, CT_mean, NEU_LYM, ALB, reversion, time, status2, status3)
+
+t3 <- table3 %>% 
+  tbl_summary(
+    by = status2, # split table by group
+    percent = "col",
+    missing = "no", # don't list missing data separately,
+    label = list(age = "Age",
+                 gender = "Sex"),
+    statistic = list(all_continuous() ~ "{median} ({IQR})",
+                     all_categorical() ~ "{n} ({p}%)")
+  ) %>%
+  add_n() %>% # add column with total number of non-missing observations
+  #add_p(pvalue_fun=~style_pvalue(.x,digits=2)) %>% # test for a difference between groups
+  modify_header(label = "**Variable**") %>% # update the column header
+  bold_labels()
+t3
+```
+
+```{r GGallySolution1, message=FALSE, warning=FALSE, eval=TRUE}
+library(GGally)
+ggpairs(select(data2, age, bmi, time, DUR, clini_score, Timika.score, CT_mean, NEU_LYM, ALB)) 
+```
+
+## Imputation diagnostic checking
+
+```{r, message=FALSE, warning=FALSE}
+library(mice)
+library(VIM)
+# png(file = "../figures/vim.png", width = 1600, height = 800)
+aggr(data2, plot = T, prop = T, numbers = F, combined = F, sortVars = T, cex.axis=0.8, gap=1, oma = c(8,3,3,2))
+# dev.off()
+```
+
+## Analysis of imputed data
+
+## Inspecting the missing data
+
+```{r}
+library(ggmice)
+#md.pattern(data)
+plot_pattern(data2)
+```
+## Creating imputations
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+# Creating imputations can be done with a call to mice() as follows:
+library(mice)
+data.imp5 <- mice(data2, m = 5, method = "pmm")
+```
+
+Imputations are generated according to the default method, which is, for numerical data, predictive mean matching (pmm). The default number of multiple imputations is equal to m = 5
+
+## Diagnostic checking
+
+An important step in multiple imputation is to assess whether imputations are plausible. Imputations should be values that could have been obtained had they not been missing. Imputations should be close to the data. Data values that are clearly impossible (e.g., negative counts, pregnant fathers) should not occur in the imputed data. Imputations should respect relations between variables, and reflect the appropriate amount of uncertainty about their "true" values. Diagnostic checks on the imputed data provide a way to check the plausibility of the imputations. The imputations for PatientHIV are stored as
+
+```{r, message=FALSE, warning=FALSE, results='hide'}
+data.imp5$imp$PatientHIV
+```
+
+## Extract the "tall" matrix which stacks the imputations
+
+```{r}
+data.comp5 <- complete(data.imp5, "long", include = TRUE) %>% na.omit()
+head(data.comp5)
+```
+
+The complete() function extracts the 5 imputed data sets from the data.imp5 object as a long (row-stacked) matrix with 4861 records. The missing entries in data have now been filled by the values from the first (of 5) imputation. The second completed data set can be obtained by complete(data.imp, 2). For the observed data, it is identical to the first completed data set, but it may differ in the imputed data.
+
+It is often useful to inspect the distributions of original and the imputed data. One way of doing this is to use the function stripplot() in mice 2.9, an adapted version of the same function in the package lattice (Sarkar 2008). The stripplot is created as
+
+```{r}
+stripplot(data.imp5, pch = 20, cex = 1.2)
+```
+Suppose that the complete-data analysis of interest is a logistic regression of outcome on a range of predictors. For this purpose, we can use the function with.mids(), a wrapper function that applies the complete data model to each of the imputed data sets
+
+```{r}
+fit <- with(data.imp5, glm(status2~age+bmi+DUR+TBTreatedBefore+DM+PatientHIV+Regimen+clini_score+Timika.score+CT_mean+NEU_LYM+ALB, family = binomial))
+```
+
+The fit object has class mipo and contains the results of 5 complete-data analyses. These can be pooled as follows:
+
+```{r}
+print(pool(fit))
+```
+More detailed output can be obtained, as usual, with the summary() function, i.e.,
+
+```{r}
+summary(pool(fit))
+```
+After multiple imputation, we find a significant effect of Timika.score. The column fmi contains the fraction of missing information as defined in Rubin (1987), and the column lambda is the proportion of the total variance that is attributable to the missing data (lamda = (B +B/m)/T).
+
+# Prediction survival model
+
+```{r, message=FALSE, warning=FALSE}
+library(survival)
+#install.packages("eventglm")
+library(eventglm)
+options(na.action = "na.exclude")
+```
+
+The main interest is in comparing the distributions of time to failure between the 4 treatment regimens. Let’s start with a survival curve.
+
+```{r}
+sfit_spu <- survfit(Surv(time, status2) ~ Regimen, data = data2)
+plot(sfit_spu, col = c("black", "slateblue", "salmon", "orange"), 
+     xlab = "days since registration", ylab = "survival")
+legend("bottomright", fill = c("black", "slateblue", "salmon", "orange"), 
+       legend = names(sfit_spu$strata))
+```
+
+As we know, hazard ratios are difficult to interpret as causal effects, even in randomized controlled trials. Better options for summarizing the effect of exposures are the survival at a particular time, or the restricted mean survival up to a given time. Let’s compare the survival at 1 year, or about 300 days since enrollment.
+
+In the figure above, we plot only the survival curve in the observation group. The vertical dotted line is at the time of interest (tmax = 300 days). The open point is at the estimated survival probability at time tmax, i.e., P(T>tmax) and the shaded area represents the restricted mean survival up to tmax, i.e., E{min(T,tmax)}=∫tmax0P(T>u)du. We can estimate these things using the survival package:
+
+
+```{r}
+sputum.sfit <- summary(sfit_spu, times = 300, rmean = 300)
+sputum.sfit
+```
+
+And we can now do inference using the eventglm package. First, we fit a regression model for the cumulative incidence, or 1 - survival:
+
+```{r}
+data2 <- data2 %>% filter(!is.na(time) & !is.na(status2) & !is.na(Regimen))
+sputum.cifit <- eventglm::cumincglm(Surv(time, status2) ~ Regimen, time = 300, data = data2)
+summary(sputum.cifit)
+```
+
+```{r}
+se.ci <- sqrt(diag(vcov(sputum.cifit, type = "robust")))
+b.ci <- coefficients(sputum.cifit)
+conf.ci <- confint(sputum.cifit)
+se.ci
+b.ci
+conf.ci
+```
+
+We find that compared to 20M regimen, the 6M regimen group has a 0.06 difference in the cumulative incidence of failure at 300 days, with 95% confidence interval -0.22, 0.01, while the 8M regimen has a 0.08 difference in the cumulative incidence of failure at 300 days, with 95% confidence interval -0.19, 0.11. This roughly agrees with the Kaplan-Meier estimates from survfit above:
+
+```{r}
+cbind(eventglm = b.ci, 
+      survfit = c(1 - sputum.sfit$surv[1], 
+  (1 - sputum.sfit$surv[2:3]) - 
+    (1 - rep(sputum.sfit$surv[1], 2))))
+```
+We can fit another model using the log link to obtain estimates of the log relative risks comparing the active treatment arms to the observation arm:
+
+```{r}
+sputum.rr <- eventglm::cumincglm(Surv(time, status2) ~ Regimen, time = 300, 
+                      data = data2, link = "log")
+br.ci <- coefficients(sputum.rr)
+confr.ci <- confint(sputum.rr)
+```
+
+```{r}
+summary(sputum.rr)
+exp(br.ci)
+exp(confr.ci)
+```
+
+We find that the estimated probability of failure before 300 days in the 6M regimen is 0.72 times higher compared to 20M regimen with 95% confidence interval 0.53, 0.98 and the estimated probability of failure before 300 days in the 8M regimen is 0.89 times higher compared to observation with 95% confidence interval 0.59, 1.35. If odds ratios are of interest, then the link = "logit" option can be used instead. Another interesting option is the link = "cloglog": the complementary log log link for the cumulative incidence implies proportional hazards. Thus models using the cloglog link applied at various time points can be used to assess the proportional hazards assumption (Perme and Andersen 2008). Other options for link functions are probit, inverse, μ−2, square root, and users can define custom link function. It is not immediately clear what the interpretation of the regression coefficients would be in these cases, but they are possible. See the stats::family help file for more details.
+
+We can fit another multivariate model using the log link :
+
+```{r}
+sputum_mul.rr <- eventglm::cumincglm(Surv(time, status2) ~ Regimen + age+gender, time = 300, 
+                      data = data2, link = "log")
+br_mul.ci <- coefficients(sputum_mul.rr)
+confr_mul.ci <- confint(sputum_mul.rr)
+```
+
+```{r}
+summary(sputum_mul.rr)
+exp(br_mul.ci)
+exp(confr_mul.ci)
+```
+
+Now for the restricted mean:
+
+```{r}
+sputum.rmfit <- eventglm::rmeanglm(Surv(time, status2) ~ Regimen, time = 300, data = data2)
+summary(sputum.rmfit)
+```
+
+```{r}
+se.rm <- sqrt(diag(vcov(sputum.rmfit, type = "robust")))
+b.rm <- coefficients(sputum.rmfit)
+conf.rm <- confint(sputum.rmfit)
+b.rm
+conf.rm
+```
+
+We find that compared to 20M regimen, the 6M regimen group has a 8.51 difference in the mean time to failure up to 300 days, with 95% confidence interval -8.09, 25.11, while the 8M regimen has a 17.01 difference in the mean time to failure up to 300 days, with 95% confidence interval -8.56, 42.58. Again, this roughly agrees with the Kaplan-Meier estimates from survfit above:
+
+```{r}
+cbind(eventglm = b.rm, 
+      survfit = c(sputum.sfit$table[1, 3], 
+sputum.sfit$table[2:4, 3] - sputum.sfit$table[1, 3]))
+```
+
+A key advantage of the regression approach is that it gives us the ability to adjust or model other covariates. Several variables are associated with time to conversion, so in this case they would be called “precision variables.” We would expect that adjusting for age, or gender in the above models would reduce the standard error estimates of the treatment effects, without changing the coefficient estimates. Let’s find out:
+
+```{r}
+sputum.ci.adj <- eventglm::cumincglm(Surv(time, status2) ~ Regimen + age + gender, time = 300, data = data2)
+sputum.rm.adj <- eventglm::rmeanglm(Surv(time, status2) ~ Regimen + age + gender, time = 300, data = data2)
+summary(sputum.rm.adj)
+```
+
+The estimates don’t change (much) and the standard errors reduce by about 5%.
+
+Models for survival
+
+If you would like to model the survival which is equal to one minus the cumulative incidence, it is straightforward. You can simply use the survival = TRUE option:
+
+```{r}
+eventglm::cumincglm(Surv(time, status2) ~ Regimen, time = 300, 
+                      data = data2, survival = FALSE)
+```
+
+Multiple time points (New in version 1.2.0)
+
+Now you can specify a vector of times in cumincglm to get a model that assumes the effect of the covariate is constant over those times.
+
+```{r}
+mvtfit1_sputum <- eventglm::cumincglm(Surv(time, status2) ~ Regimen, 
+        time = c(100, 200, 300, 400, 500),
+        data = data2, survival = FALSE)
+summary(mvtfit1_sputum)
+```
+In this model, the intercept is the survival probability in the Obs arm at time 100 (the reference time). The terms labeled factor(pseudo.time)t represent the change in the intercept associated with the time t. So, for example, the probability of reversion in the 20M regimen at time 200 is 0.12 + 0.17 = 0.29.
+
+Looking at the survival curves in the figure above, the assumption of a constant treatment effect on the survival difference scale may be questionable. We can allow covariate effects to be time dependent by wrapping them in the special term tve() in the right side of the formula.
+
+```{r}
+mvtfit2_sputum <- eventglm::cumincglm(Surv(time, status2) ~ tve(Regimen), 
+        time = c(100, 200, 300, 400, 500),
+        data = data2, survival = FALSE)
+summary(mvtfit2_sputum)
+```
+
+Now the coefficients labeled factor(pseudo.time)t:Covariate represent the covariate effect at time t. So, for example, the difference in probabilities of conversion of 8M regimen to 20M regimen at time 300 is
+
+```{r}
+round(summary(mvtfit2_sputum)$coefficients[13,, drop = FALSE],2)
+```
+
+Compare with the estimate from survfit:
+
+```{r}
+round(summary(sfit_spu, times = 300)$surv[3] - 
+  summary(sfit_spu, times = 300)$surv[1], 2)
+```
+The key advantage of the regression approach is that we can adjust for covariates, do inference directly, and have more flexible models. The tve term allows you to have a mix of time-varying and time-constant effects. Just apply it to any covariate that you want to be time-varying.
+
+Censoring assumptions
+
+By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the model.censoring and formula.censoring options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates:
+
+```{r}
+sputum.ci.cen1 <- eventglm::cumincglm(Surv(time, status2) ~ Regimen + age + gender, time = 300, 
+                           data = data2, model.censoring = "stratified", 
+                           formula.censoring = ~ Regimen)
+sputum.ci.cen1
+```
+Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used (Overgaard, Parner, and Pedersen 2019). According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model.
+
+```{r}
+sputum.ci.cen2 <- eventglm::cumincglm(Surv(time, status2) ~ Regimen, time = 300, 
+                           data = data2, model.censoring = "coxph", 
+                           formula.censoring = ~ Regimen)
+# sputum.ci.cen3 <- eventglm::cumincglm(Surv(time, status2) ~ Regimen, time = 300, 
+#                            data = data2, model.censoring = "aareg", 
+#                            formula.censoring = ~ Regimen)
+
+round(cbind("indep" = coef(sputum.ci.adj),
+  "strat" = coef(sputum.ci.cen1),
+  "coxipcw" = coef(sputum.ci.cen2),
+  "aalenipcw" = coef(sputum.ci.cen3)), 3)
+```
+In these models, the IPCW weights are returned in the element called “ipcw.weights.” If there are multiple time points, this will be a matrix with one column per time point.
+
+```{r}
+sputum.ci.cen2b <- eventglm::cumincglm(Surv(time, status2) ~ Regimen + age + gender, 
+                            time = c(100, 200, 300), 
+                           data = data2, model.censoring = "coxph", 
+                           formula.censoring = ~ Regimen + age + gender)
+sputum.ci.cen2b
+```
+
+```{r}
+head(sputum.ci.cen2b$ipcw.weights)
+```
+
+```{r}
+summary(sputum.ci.cen2b$ipcw.weights)
+```
+
+# Full model
+
+```{r, message=FALSE, warning=FALSE}
+library(caret)
+library(DescTools)
+# Fit the final model with the selected variables
+# formula <- as.formula(paste("status ~", paste(selected_variables, collapse = " + ")))
+# final_model <- glm(formula, data = data_imputed, family = binomial())
+library(future)
+library(parallel)
+# detectCores()
+# registerDoParallel(6)
+plan(sequential)
+plan(multisession, workers=3)
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+n_bootstraps <- 20
+
+# Create a list to store the results for each imputed dataset
+results_list_full <- vector("list", n_imputations)
+# Impute the missing values
+imp <- mice(data2, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+
+# Loop over the imputations
+for (i in 1:n_imputations) {
+  
+    #Make a complete dataset of imputation in long format and remove NA
+  data_imputed <- complete(imp, action=i, include = F)
+  
+  # Create a list to store the results for each bootstrap
+  results_boot_full<- vector("list", n_bootstraps)
+  
+  # Loop over the bootstraps
+  for (j in 1:n_bootstraps) {
+    results_boot_full[[j]] <- future({
+    # Create the bootstrap sample
+    index <- sample(1:dim(data_imputed)[1], replace = T)
+    data_boot <- data_imputed[index, ]
+    
+    set.seed(123)
+    training.samples <- data_boot$status2 %>%
+      createDataPartition(p=0.7, list = FALSE)
+    train.data <- data_boot[training.samples, ] %>% na.omit()
+    test.data <- data_boot[-training.samples, ] %>% na.omit()
+    
+    # Fit model and make predictions
+    full.model <- eventglm::cumincglm(Surv(time, status2) ~ Regimen + age + gender + bmi + DUR + TBTreatedBefore + DM + PatientHIV + clini_score + Timika.score + CT_mean + NEU_LYM + ALB, time = 300, 
+                           data = train.data, model.censoring = "coxph", 
+                           formula.censoring = ~ Regimen + age + gender + bmi + DUR + TBTreatedBefore + DM + PatientHIV + clini_score + Timika.score + CT_mean + NEU_LYM + ALB)
+    
+    probabilities.FULL <- full.model %>% predict(test.data, type = "response")
+    predicted.classes.FULL <- ifelse(probabilities.FULL > 0.5, "failure", "censor")
+    
+    # Model accuracy
+    observed.classes.FULL <- test.data$status2
+    mean(predicted.classes.FULL == observed.classes.FULL)
+    
+    # Store the final variables and their coefficients
+    final_variables <- names(full.model$coefficients)
+    final_coefs <- coef(full.model)
+    final_vars <- vcov(full.model)
+    roc1 <- pROC::roc(observed.classes.FULL, as.vector(probabilities.FULL))
+    brier1 <- DescTools::BrierScore(full.model)
+    
+    # Store the results for this bootstrap
+    list(final_variables = final_variables,
+                              final_coefs = final_coefs,
+                              final_vars = final_vars,
+                              roc1 = roc1,
+                              brier1 = brier1)
+  }, gc=T, seed=T)
+  cat(j)
+  }
+  # Combine the results for all bootstraps for this imputed dataset
+  results_list_full[[i]] <- lapply(results_boot_full, value)
+  
+}
+
+# Unlist results
+results_list_full |> unlist(recursive = F) |> purrr::transpose() -> .
+final_coefs_full <- .$final_coefs
+final_vars_full <- .$final_vars
+final_variables_full <- .$final_variables
+roc1_full <- .$roc1 |> purrr::transpose()
+brier1_full <- .$brier1
+
+###Pool MI using Rubin's rules
+Q_mean_reg <- apply(array(unlist(final_coefs_full), c(1,16,n_imputations*n_bootstraps))[1,,], 1, mean) # Q_mean_reg contains the coefficients from the model
+U_mean_reg <- diag(apply(array(unlist(final_vars_full), c(16,16,n_imputations*n_bootstraps)), 1:2, mean)) # U the within-imputation variability i.e. the mean of the squared standard errors within the imputed data sets
+B_var_reg <- apply(array(unlist(final_coefs_full), c(1,16,n_imputations*n_bootstraps))[1,,], 1, var) # B the between-imputation variability caused by the differences in imputed values across the data sets
+# B_var_reg <-  apply((Q_mean_reg - array(unlist(final_coefs_aic), c(1,20,n_imputations*n_bootstraps))[1,,])^2, 1, sum)/ (n_imputations*n_bootstraps - 1) # B the between-imputation variability caused by the differences in imputed values across the data sets
+T_var_reg <- sqrt(U_mean_reg + (1 + 1/(n_imputations*n_bootstraps))*B_var_reg) # The overall variance T associated with Q
+lower_ci_reg <- Q_mean_reg - 1.96*T_var_reg
+upper_ci_reg <- Q_mean_reg + 1.96*T_var_reg
+z <- Q_mean_reg/T_var_reg
+p <- (1 - pnorm(abs(z), 0, 1)) * 2 # 2-tailed z test
+
+Q_mean_reg #Q_mean_reg contains the coefficients from the model
+T_var_reg #T_var_reg contains the standard errors from the model
+lower_ci_reg #lower limits of 95% CIs
+upper_ci_reg #upper limits of 95% CIs
+p #2-tailed p value
+
+result_pool_full <- rbind(Q_mean_reg, T_var_reg, lower_ci_reg, upper_ci_reg, p) %>% data.frame()
+result_pool_full <- t(result_pool_full)
+rownames(result_pool_full) <- final_variables_full[[1]]
+colnames(result_pool_full) <- c("Coef.", "Std.Error", "Lower CI", "Upper CI", "P_value")
+result_pool_full
+
+###Pool MI using Rubin's rules - ROC & Brier
+roc1p_full <- mean(array(unlist(as.numeric(roc1_full$auc)), c(1,1,n_imputations*n_bootstraps))[1,,])
+brier1p_full <- mean(array(unlist(brier1_full), c(1,1,n_imputations*n_bootstraps))[1,,])
+
+# Save results for later use
+save(results_list_full, result_pool_full, roc1p_full, brier1p_full, file="FULL_results.RData")
+```
+
+# Model display - FULL
+
+```{r, message=FALSE, warning=FALSE}
+# Model display ------------------------
+library(mice)
+library(rms)
+library(car)
+#################### do this on stacked MI data
+# Set seed for reproducibility
+set.seed(1234)
+# Set the number of imputations and bootstraps
+n_imputations <- 5
+imp <- mice(data2, m = n_imputations, maxit = 10, method = "pmm", printFlag = F)
+data.imp.long2 <- complete(imp, "long", include = F)
+
+dd <- datadist(data.imp.long2); options(datadist = 'dd')
+f <- rms::lrm(status2 ~ Regimen + age + gender + bmi + DUR + TBTreatedBefore + DM + PatientHIV + clini_score + Timika.score + CT_mean + NEU_LYM + ALB, data = na.omit(data.imp.long2), x=TRUE,y=TRUE)
+
+car::vif(f)
+
+f <- Newlabels(f, c("Regimen", "Age, years", "Gender", "BMI, kg/m\u00B2", "Duration of illness", "TB treatment before", "Diabetes", "HIV positive", "Clinical score", "Timika score", "CT mean", "Neutrophil/Lymphocyte ratio", "Albumin"))
+
+# ss <-  c(.05 ,.1 ,.2 ,.3 ,.4 ,.5 ,.6 ,.7 ,.8 ,.9 ,.95 )
+
+plot(nomogram(fit = f, lp = F, 
+              vnames="labels",
+              varname.label=TRUE, varname.label.sep="=",
+              fun = plogis, 
+              fun.at=c(.001,.01,.05,seq(.1,.9,by=.1),.95,.99,.999),
+              funlabel="Risk of treatment failure"))
+
+save(data, data.imp.long, file="data.RData")
+```
+
+### Validating fitted models with rms::validate() and rms:calibrate()
+
+```{r}
+(val <- validate(f, B = 200))
+(c_opt_corr <- 0.5 * (val[1, 5] + 1))
+```
+
+```{r}
+cal <- rms::calibrate(f, B = 200)
+plot(cal)
+
+set.seed(13032023)
+val_new <- rms::validate(f, B = 200)
+  
+shrink_factor <- round(val_new["Slope","index.corrected"], 2)
+c_corrected <- round(0.5 * (1 + val_new["Dxy","index.corrected"]), 2)
+```
+
+# Plotting mean ROC curve for multiple ROC curves - FULL
+
+```{r, message=FALSE, warning=FALSE}
+# Unlist results ROC
+results_list_full |> unlist(recursive = F) |> purrr::transpose() -> .
+roc1_full <- .$roc1 |> purrr::transpose()
+roc1_full |> unlist(recursive = F) -> .
+
+PredictionValues <- roc1_full$predictor |> unlist() 
+RealClass <- roc1_full$response %>% unlist()
+
+sampledList <- lapply(seq_along(roc1_full$predictor), function(i) {
+  setNames(roc1_full$predictor[[i]], paste(i, seq_along(roc1_full$predictor[[i]]), sep = "."))
+})
+Sample <- lapply(seq_along(sampledList), function(i) {as.numeric(gsub("\\..*", "", names(sampledList[[i]])))}) %>% unlist()
+
+sensitivity <- roc1_full$sensitivities %>% unlist()
+specificity <- roc1_full$specificities %>% unlist()
+thresholds <- roc1_full$thresholds %>% unlist()
+
+predictions_all_samples <- data.frame(
+    Sample = Sample,
+    PredictionValues = PredictionValues,
+    RealClass = RealClass
+)
+
+library(cutpointr)
+library(tidyverse)
+mean_roc <- function(data, cutoffs = seq(from = 0, to = 1, by = 0.05)) {
+    map_df(cutoffs, function(cp) {
+        out <- cutpointr(data = data, x = PredictionValues, class = RealClass,
+                         subgroup = Sample, method = oc_manual, cutpoint = cp,
+                         pos_class = "failure", direction = ">=")
+        data.frame(cutoff = cp, 
+                   sensitivity = mean(out$sensitivity),
+                   specificity = mean(out$specificity))
+    })
+}
+
+mr <- mean_roc(predictions_all_samples)
+
+ggplot(mr, aes(x = 1 - specificity, y = sensitivity)) + 
+    geom_step() + geom_point() +
+    theme(aspect.ratio = 1)
+
+# plot the separate ROC curves and the added mean ROC curve with cutpointr:
+# png(file = "../figures/roc_full.png", width = 600, height = 500)
+cutpointr(data = predictions_all_samples, 
+          x = PredictionValues, class = RealClass, subgroup = Sample,
+          pos_class = "failure", direction = ">=") %>%
+  plot_roc(display_cutpoint = T) + theme(legend.position="none") +
+  geom_line(data = mr, mapping = aes(x = 1 - specificity, y = sensitivity), color = "black") +
+  annotate("text", x=0.2, y=0.9, label=paste("Mean AUC", round(roc1p_full, 3), sep = "="), size=4) +
+  annotate("text", x=0.2, y=0.85, label=paste("Mean Brier score", round(brier1p_full, 3), sep = "="), size=4)
+# dev.off()
+```
+
+References
+Overgaard, Morten, Erik Thorlund Parner, Jan Pedersen, et al. 2017. “Asymptotic Theory of Generalized Estimating Equations Based on Jack-Knife Pseudo-Observations.” The Annals of Statistics 45 (5): 1988–2015.
+Overgaard, Morten, Erik Thorlund Parner, and Jan Pedersen. 2019. “Pseudo-Observations Under Covariate-Dependent Censoring.” Journal of Statistical Planning and Inference 202: 112–22.
+Parner, Erik T, Per K Andersen, and Morten Overgaard. 2020. “Cumulative Risk Regression in Case–Cohort Studies Using Pseudo-Observations.” Lifetime Data Analysis, 1–20.
+Pavlič, Klemen, and Maja Pohar Perme. 2019. “Using Pseudo-Observations for Estimation in Relative Survival.” Biostatistics 20 (3): 384–99.
+Perme, Maja Pohar, and Per Kragh Andersen. 2008. “Checking Hazard Regression Models Using Pseudo-Observations.” Statistics in Medicine 27 (25): 5309–28.
