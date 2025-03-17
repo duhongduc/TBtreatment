@@ -1016,34 +1016,45 @@ ggsave(filename = "figures/Culture_Heatmap_Fixed_v1.png", width = 30, height = 4
 ```
 
 ```{r}
-# Create a new Excel workbook
-wb <- createWorkbook()
-addWorksheet(wb, "TB Culture Data")
+library(openxlsx)
+library(dplyr)
+library(tidyr)
 
-# Define colors for different culture statuses
-color_mapping <- c(
-  "Positive" = "#FF6961",   # Red
-  "Negative" = "#77DD77",   # Green
-  "No sputum" = "#FFD700"   # Yellow
+# Convert long format to wide format
+patient_wide <- patient_data %>%
+  pivot_wider(names_from = timepoints, values_from = Culture)
+
+# Create an Excel workbook
+wb <- createWorkbook()
+addWorksheet(wb, "Culture Heatmap")
+
+# Define color mapping
+color_mapping <- list(
+  "Positive" = createStyle(fgFill = "#FF6961"),  # Red
+  "Negative" = createStyle(fgFill = "#77DD77"),  # Green
+  "No sputum" = createStyle(fgFill = "#D3D3D3")  # Grey
 )
 
 # Write data to Excel
-writeData(wb, "TB Culture Data", df_long, startCol = 1, startRow = 1, colNames = TRUE)
+writeData(wb, "Culture Heatmap", patient_wide, startCol = 1, startRow = 1, colNames = TRUE)
 
-# Apply color formatting
-for (i in 2:nrow(df_long) + 1) {  # Start from row 2 (skip header)
-  status <- df_long$Culture[i - 1]  # Adjust index
-  if (status %in% names(color_mapping)) {
-    addStyle(
-      wb, "TB Culture Data",
-      style = createStyle(fgFill = color_mapping[status]),
-      rows = i, cols = 3, gridExpand = TRUE
-    )
+# Apply color formatting to each cell
+for (row in 2:(nrow(patient_wide) + 1)) {  # Skip header row
+  for (col in 2:ncol(patient_wide)) {  # Skip studycode column
+    status <- as.character(patient_wide[row - 1, col])  # Convert to character
+    if (!is.na(status) && status %in% names(color_mapping)) {
+      addStyle(
+        wb, "Culture Heatmap",
+        style = color_mapping[[status]],  # Use the correct style
+        rows = row, cols = col,
+        gridExpand = FALSE, stack = TRUE  # Ensure formatting applies
+      )
+    }
   }
 }
 
-# Save the file
-saveWorkbook(wb, "output/TB_Culture_Data.xlsx", overwrite = TRUE)
+# Save the Excel file
+saveWorkbook(wb, file = "output/Culture_Heatmap.xlsx", overwrite = TRUE)
 
 print("Excel file with color-coded TB culture data saved successfully!")
 ```
