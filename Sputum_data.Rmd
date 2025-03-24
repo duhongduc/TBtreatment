@@ -1,0 +1,505 @@
+---
+title: "sputum_clean data check"
+author: "Trietlm"
+date: "3/20/2025"
+output: html_document
+---
+
+# DEPENDENCES
+
+```{r, message=FALSE}
+library(tidyverse)
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(reshape2)
+library(ggplot2)
+library(FSA)
+library(knitr)
+#library(patchwork)
+```
+
+# DATA
+
+**Importing data**
+
+::: {style="text-align: justify;"}
+Reading file "sputum_clean.csv" and stores it in the object `sputum_data`.
+:::
+
+```{r}
+sputum_data <- read.csv("data/sputum_clean.csv")
+```
+
+::: {style="text-align: justify;"}
+Retrieving column names of `sputum_data` to verify the structure of the dataset, ensuring that all expected variables are correctly loaded for further processing and analysis.
+:::
+
+```{r}
+colnames(sputum_data)
+```
+
+**Creating `mini_data1` from `sputum_data`**
+
+::: {style="text-align: justify;"}
+Creating `mini_data1` by selecting specific columns from the `sputum_data` dataframe, including `studycode` (column 1) as the patient identifier, `Regimen` (column 3) representing the treatment regimen, sputum culture results from various time points (columns 67 to 92), and sputum sample collection dates (columns 93 to 118).
+:::
+
+```{r}
+mini_data1  <- sputum_data[ ,c(1,3, 67:118)]
+colnames(mini_data1)
+```
+
+**Calculating count and percentage of each regimen type**
+
+```{r}
+regimen_summary <- mini_data1 %>%
+  group_by(Regimen) %>% 
+  summarise(Count = n()) %>% 
+  mutate(Percentage = round((Count / sum(Count)) * 100, 2)) %>% 
+  arrange(desc(Count))
+
+kable(regimen_summary, caption = "Distribution of Patients by Treatment Regimen")
+```
+
+::: {style="text-align: justify;"}
+The results show that the 6-month regimen (6M) is the most common, accounting for 57.35% (523 cases) of the total. The 9-month regimen (9M) follows with 24.67% (225 cases), while the 20-month (20M) and 8-month (8M) regimens are less frequent, making up 9.54% (87 cases) and 8.44% (77 cases), respectively.
+:::
+
+# 1. Creating heatmap to visualize sputum culture status in tuberculosis patients
+
+## a. Creating function for color coding sputum culture status
+
+```{r}
+get_color <- function(values) {
+  colors <- character(length(values))
+  
+  for (i in seq_along(values)) {
+    if (values[i] == "Positive") {
+      colors[i] <- "red"                    # Red for positive status
+    } else if (values[i] == "No sputum") {
+      colors[i] <- "grey"                   # Grey for no sputum status
+    } else if (values[i] == "Negative") {
+      if (i > 1 && values[i - 1] == "Negative") {
+        colors[i - 1] <- "blue"             # Blue for consecutive negatives (previous entry)
+        colors[i] <- "blue"                 # Blue for consecutive negatives (current entry)
+      } else {
+        colors[i] <- "yellow"               # Light Blue for single negative status
+      }
+    }
+  }
+  return(colors)
+}
+```
+
+::: {style="text-align: justify;"}
+Note: The function `get_color` is designed to assign specific colors to sputum culture statuses based on their values and patterns. It iterates through a given vector of culture results and assigns the color red for "Positive" cases, grey for "No sputum" cases, and different shades for "Negative" cases depending on their sequence. If a "Negative" value appears alone, it is assigned yellow, while consecutive "Negative" values are assigned blue to distinguish them as part of a continuous negative streak. The function uses a loop to check each value and applies conditional logic to determine the appropriate color.
+
+However, there are some edge cases to consider, such as ensuring the first occurrence of "Negative" is correctly categorized if it starts a sequence and handling cases where a "Negative" at the end of the vector might not be recognized as part of a consecutive series. Despite these considerations, the function effectively visualizes trends in sputum culture results, making it useful for identifying patterns in tuberculosis culture conversion.
+:::
+
+## b. Creating a color coded dataframe for sputum culture status visualization
+
+```{r}
+color_df <- mini_data1[, 3:28] %>%          # Select sputum culture status columns
+  apply(1, get_color) %>%                   # Apply get_color function row-wise
+  t() %>%                                   # Transpose to maintain row structure
+  as.data.frame() %>%                       # Convert to dataframe
+  setNames(colnames(mini_data1)[3:28]) %>%  # Preserve original column names
+  cbind(studycode = mini_data1$studycode,   # Add studycode column
+        Regimen = mini_data1$Regimen)       # Add Regimen column
+```
+
+::: {style="text-align: justify;"}
+Note: The dataframe `color_df` is created by selecting sputum culture status columns (columns 3 to 28) from `mini_data1`, applying the `get_color` function row-wise to convert culture statuses into corresponding colors, transposing the result to maintain the original row structure (of `mini_data1`), converting it into a dataframe while preserving the original column names, and finally adding `studycode` and `Regimen` columns to retain key patient identifiers and treatment regimen information.
+:::
+
+## c. Creating a long format dataframe for sputum culture status visualization in ggplot
+
+```{r}
+color_df_long <- color_df %>%
+  pivot_longer(cols = 1:26, names_to = "TimePoint", values_to = "Color") %>%
+  mutate(Regimen = factor(Regimen, levels = c("6M", "8M", "9M", "20M"))) %>% 
+  arrange(Regimen, studycode)  # Ensure patients are sorted properly
+```
+
+::: {style="text-align: justify;"}
+Note: The dataframe `color_df_long` is prepared for ggplot by selecting relevant columns from `color_df`, converting the sputum culture status columns (1 to 26) into a long format using `pivot_longer()` to create the `TimePoint` and `Color` variables, transforming `Regimen` into a factor with a specified order (6M, 8M, 9M, 20M), and arranging the data by `Regimen` to ensure proper ordering for visualization.
+:::
+
+## d. Creating heatmap with `Regimen` legend
+
+```{r}
+plot1 <- ggplot(color_df_long,
+       aes(x = TimePoint, y = studycode, fill = Color)) +
+  geom_tile() +
+  scale_fill_identity() +
+  facet_grid(rows = vars(Regimen), scales = "free_y", space = "free_y") +
+  labs(title = "Patient Data Heatmap by Regimen", x = "Time Points", y = NULL, fill = "Culture Status") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = -0.2),
+    axis.text.y = element_blank(),    
+    axis.ticks.y = element_blank(),
+    strip.text.y = element_text(size = 12, face = "bold", angle = 0))
+
+plot1
+```
+
+::: {style="text-align: justify;"}
+**The heatmap visualizes the sputum culture status of tuberculosis patients over time, categorized by different treatment regimens (6M, 8M, 9M, 20M). Each row represents an individual patient, while each column corresponds to a specific time point in the treatment process. The colors indicate different culture results: red for positive sputum cultures, blue for consecutive negatives, yellow for single negative results, and grey for missing sputum samples.**
+
+At the beginning of treatment, a majority of patients show red, indicating active tuberculosis infection. As treatment progresses, many patients transition to blue, signifying successful conversion to negative cultures, while others display yellow, reflecting isolated negative results. Grey cells appear intermittently, suggesting that some patients either missed sputum collection at specific time points or were lost to follow-up.
+
+Differences in treatment response can be observed across regimens. The largest group, 6M (523 \~ 57.3%), shows a strong shift from red to blue over time, indicating effective bacterial clearance. The 9M (225 \~24.7%) regimen follows a similar pattern but includes some patients who remain positive longer. The 8M (77 \~ 8.4%) and 20M groups have fewer patients, yet a notable proportion in the 20M (87 \~ 9.5%) group still exhibits red at later stages, which may indicate persistent infections or slower response to treatment. Patients with prolonged red signals may require closer monitoring or alternative treatment strategies, while those with consistent blue results suggest successful outcomes. The presence of missing data in later stages raises questions about follow-up adherence and potential gaps in treatment evaluation.
+:::
+
+# 2. Visualizing culture status over time by `Regimen`
+
+## a. Preparing data for plotting stacked bar chart of culture status over time
+
+```{r}
+culture_summary <- mini_data1 %>%
+  group_by(Regimen) %>%
+  summarise(
+    across(
+      starts_with("Culture."), 
+      list(
+        Positive = ~ sum(. == "Positive", na.rm = TRUE),
+        Negative = ~ sum(. == "Negative", na.rm = TRUE),
+        No_Sputum = ~ sum(. == "No sputum", na.rm = TRUE)
+      )
+    )
+  )%>%
+  pivot_longer(
+    -Regimen, 
+    names_to = c("Culture_Stage", "Status"),
+    names_pattern = "(.+)_(Positive|Negative|No_Sputum)",
+    values_to = "Count"
+  )%>%
+  mutate(
+    Culture_Stage = str_replace(Culture_Stage, "Culture\\.", ""),
+    Culture_Stage = factor(Culture_Stage, levels = c("N0", "N14", paste0("T", sprintf("%02d", 1:24)))),
+    Status = ifelse(is.na(Status), "No sputum", Status),
+    Status = factor(Status, levels = c("Positive", "Negative", "No_Sputum"))
+  )
+```
+
+::: {style="text-align: justify;"}
+Note: The dataframe `culture_summary` is created to prepare the sputum culture data for visualization (see the code block below). It begins by grouping the dataset by treatment regimen and then counts the occurrences of each culture status — "Positive", "Negative", and "No Sputum" — at various time points. The data is then reshaped from a wide format, where each time point has separate columns, into a long format using `pivot_longer()`. This transformation ensures that the data can be easily plotted using `ggplot2` in the code block below. Additionally, it modifies column names for clarity, converts culture stages into a properly ordered factor, and ensures that "No Sputum" values are explicitly accounted for to avoid missing data issues in the visualization. This structured data format allows the second block to generate a faceted stacked bar chart that effectively compares the distribution of sputum culture results over time for different treatment regimens.
+:::
+
+## b. Plotting stacked bar chart of culture status over time
+
+```{r}
+plot2 <- ggplot(culture_summary, aes(x = Culture_Stage, y = Count, fill = Status)) +
+  geom_bar(stat = "identity", position = "fill") +  
+  facet_wrap(~ Regimen) +  
+  scale_fill_manual(values = c("Positive" = "red",
+                               "Negative" = "blue",
+                               "No_Sputum" = "grey")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.3, size = 8))
+
+plot2
+```
+
+::: {style="text-align: justify;"}
+**The plot presents the longitudinal distribution of sputum culture results across four different tuberculosis (TB) treatment regimens: 6M, 8M, 9M, and 20M. Each subplot represents a specific regimen, and the x-axis denotes the time points at which sputum cultures were taken, starting from baseline (N0) through different follow-up timepoints (N14, T01-T24). The y-axis represents the proportion of patients at each time point, categorized into three sputum culture statuses: Positive (red), Negative (blue), and No Sputum (grey)**.
+
+Initially, at N0, the majority of patients exhibit positive sputum cultures (red), indicating active TB infection. As treatment progresses, there is a noticeable decline in positive cultures and a corresponding increase in negative cultures (blue), suggesting that the treatment is effectively reducing bacterial presence. Over time, the proportion of No Sputum cases (grey) increases, particularly in the later months, which could indicate either successful treatment outcomes (patients no longer producing sputum due to recovery) or an inability to produce sputum for other reasons.
+
+The differences across regimens highlight variations in treatment effectiveness and sputum conversion rates. The 6M and 8M regimens show a relatively faster transition from positive to negative cultures, whereas the 20M regimen maintains a longer period of positive cultures before gradually transitioning. The 9M regimen also exhibits a steady decline in positive cases, with an increasing proportion of negative and no sputum results over time. The presence of grey bars in later months suggests that culture-based evaluations may be challenging toward the end of treatment due to reduced sputum production.
+:::
+
+# 3. Outcome: Good, Bad and Lost Follow Up
+
+## a. Adding `outcome2` column to `mini_data1` from `sputum_data`
+
+```{r}
+mini_data1$outcome2 <- sputum_data$outcome2
+```
+
+## b. Summarizing treatment outcome distribution by `Regimen`
+
+```{r}
+outcome2_table <- table(mini_data1$outcome2, mini_data1$Regimen)
+
+outcome2_summary <- as.data.frame(outcome2_table)
+colnames(outcome2_summary) <- c("Outcome", "Regimen", "Count")
+
+outcome2_summary <- outcome2_summary %>%
+  group_by(Regimen) %>%
+  mutate(Percentage = round(Count / sum(Count) * 100, 2))
+kable(outcome2_summary, caption = "Distribution of Treatment Outcomes Across Regimens")
+```
+
+## c. Stacked and proportional bar charts of treatment outcomes by `Regimen`
+
+```{r}
+plot3 <- ggplot(outcome2_summary, aes(x = Regimen, y = Count, fill = Outcome)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = c("Good outcome" = "blue", 
+                               "Bad outcome" = "red", 
+                               "Lost FU" = "grey")) +
+  labs(title = "Treatment Outcomes by Regimen",
+       x = "Regimen", y = "Count", fill = "Outcome") +
+  theme_minimal()
+
+plot4 <- ggplot(outcome2_summary, aes(x = Regimen, y = Percentage, fill = Outcome)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  scale_fill_manual(values = c("Good outcome" = "blue", 
+                               "Bad outcome" = "red", 
+                               "Lost FU" = "grey")) +
+  labs(title = "Percentage of Treatment Outcomes by Regimen",
+       x = "Regimen", y = "Percentage", fill = "Outcome") +
+  theme_minimal()
+
+plot3 / plot4
+```
+
+::: {style="text-align: justify;"}
+**The plots present a comparison of treatment outcomes across different regimens (20M, 6M, 8M, and 9M) using two different visualizations.**
+
+The top plot represents the absolute count of treatment outcomes for each regimen. The most striking observation is that the 6M regimen has the highest number of patients, far surpassing the other regimens. This indicates that the 6M regimen is the most commonly used in the dataset. The 9M regimen follows with a moderate number of patients, while the 8M and 20M regimens have significantly fewer participants.
+
+The bottom plot, on the other hand, normalizes the data by scaling each bar to 100%, showing the proportion of outcomes within each regimen rather than the raw counts. Despite the substantial difference in patient numbers, the proportion of good outcomes appears relatively similar across regimens. However, a closer look suggests that the 20M and 9M regimens have slightly higher proportions of bad outcomes compared to the others.
+:::
+
+# 3.Taking an overall look at the first sputum culture conversion
+
+::: {style="text-align: justify;"}
+First sputum culture conversion refers to the first time a patient’s sputum culture result changes from positive (indicating the presence of tuberculosis bacteria) to negative (indicating the absence of tuberculosis bacteria).
+
+Note: I rely on this understanding to implement functions for determining First sputum culture conversion in this section. As a result, the obtained outcomes may differ slightly from the data in the existing "First Conversion" column in the dataset. I am conducting this process to test writing a function that determines First Conversion solely based on the available data, without prior confirmation from clinical experts. These differences will be compared later
+:::
+
+## a. Creating function for identifying first sputum culture conversion
+
+```{r}
+find_first_culture_conversion <- function(row) {
+  first_positive_index <- which(row %in% c("red"))[1]
+  
+  if (is.na(first_positive_index)) {
+    return(NA)
+  }
+  
+  conversion_index <- which(row %in% c("yellow", "blue") & seq_along(row) > first_positive_index)[1]
+  
+  if (!is.na(conversion_index)) {
+    return(names(row)[conversion_index])
+  } else {
+    return(NA)
+  }
+}
+```
+
+::: {style="text-align: justify;"}
+Note: The function `find_first_culture_conversion` is designed to identify the first time a patient’s sputum culture status changes from positive to negative. It begins by locating the first occurrence of a "red" value, which represents a positive sputum culture, within a given row of data. If no positive culture is found, the function immediately returns `NA`, indicating that the patient never had a positive result to begin with. If a positive result is identified, the function then searches for the first instance of either "yellow" or "blue," which indicate negative culture results, occurring after the first positive result. The function ensures that this transition is correctly captured by verifying that the index of the negative result is greater than the index of the first positive result. If such a conversion is found, the function returns the corresponding column name, which represents the time point at which the first negative culture was recorded. If no conversion is detected, meaning that the patient remained positive throughout the observed period, the function returns `NA`.
+:::
+
+## b. Creating column for first sputum culture conversion
+
+```{r}
+mini_data1$First_Culture_conversion <- apply(color_df[, 1:26], 1, find_first_culture_conversion)
+```
+
+::: {style="text-align: justify;"}
+Note: Column `First_Culture_conversion` is created in the `mini_data1` dataset by applying the function `find_first_culture_conversion` to each row of the dataframe `color_df` across the first 26 columns (Culture.N0, Culture.N14 and Culture.T01 -\> Culture.T24). The function `apply()` is used with `MARGIN = 1`, meaning it operates row-wise. Each row represents an individual patient's sputum culture results over multiple time points, and the find_first_culture_conversion function likely determines the earliest time point at which the culture result changes from positive to negative. The output of this function is then stored in the corresponding row of the `First_Culture_conversion` column in `mini_data1`.
+:::
+
+## c. Creating function to determine time of first culture conversion date
+
+```{r}
+Get_time_first_conversion <- function(timepoint, studycode) {
+   if (is.na(timepoint)) {
+    return(NA)
+  }
+  
+  date_column <- paste0("date.", sub("Culture.", "", timepoint))
+  
+  conversion_time <- mini_data1[mini_data1$studycode == studycode, date_column]
+  
+  return(conversion_time)
+}
+```
+
+::: {style="text-align: justify;"}
+Note: The function `Get_time_first_conversion` is designed to determine the exact date when a patient’s first sputum culture conversion occurred. It takes two arguments: `timepoint`, which represents the column name of the first culture conversion identified in `mini_data1`, and `studycode`, which is the unique patient identifier.
+
+The function first checks whether `timepoint` is `NA`. If it is, this means no culture conversion was detected for the patient, so the function returns `NA`. Otherwise, the function constructs the corresponding date column name by extracting the timepoint number from `timepoint` (e.g., converting `"Culture.T03"` to `"date.T03"`). Using this constructed column name, the function then retrieves the conversion date from `mini_data2`, where the `studycode` matches the patient's identifier. Finally, it returns the date when the first negative sputum culture was recorded.
+
+This function ensures that each patient's first culture conversion event is accurately linked to its corresponding date, enabling further analysis of conversion timing across different treatment regimens.
+:::
+
+## d. Compute Time of First Culture Conversion
+
+```{r}
+mini_data1$Time_First_conversion <- mapply(Get_time_first_conversion,
+                                           mini_data1$First_Culture_conversion,
+                                           mini_data1$studycode)
+```
+
+::: {style="text-align: justify;"}
+Note: The time of the first sputum culture conversion for each patient are computed and stored in the column `Time_First_conversion` within the `mini_data1` dataset.
+
+The function `mapply()` is used to apply `Get_time_first_conversion` to multiple arguments simultaneously. Specifically, it takes the patient's first culture conversion status (`First_Culture_conversion`) and their study code (`studycode`) as inputs. The function `Get_time_first_conversion` likely determines the exact time point when the sputum culture first converts from positive to negative. The computed values are then assigned to the `Time_First_conversion` column.
+:::
+
+## e. Prepare data for dumbbell plot of culture conversion time
+
+```{r}
+mini_data1$date.N0 <- sputum_data$date.N0
+
+mini_data1 <- mini_data1 %>%
+  mutate(
+    date.N0 = as.Date(date.N0),
+    First_Conversion_Date = as.Date(Time_First_conversion),
+    Time_Diff = as.numeric(First_Conversion_Date - date.N0)
+  ) %>%
+  mutate(Regimen = factor(Regimen, levels = c("6M", "8M", "9M", "20M"))) %>%
+  arrange(Regimen, Time_Diff) %>%
+  mutate(studycode = factor(studycode, levels = unique(studycode)))
+```
+
+::: {style="text-align: justify;"}
+Note: The code above prepares `mini_data1` for visualizing the time to first sputum culture conversion using a Dumbbell plot. It processes the dataset by converting relevant date columns into `Date` format, calculating the difference in days between the baseline date and the conversion date (`Time_Diff`), and ensuring that treatment regimens are properly ordered for plotting. The data is then sorted and structured, enabling a clear representation of the time from baseline to culture conversion for each patient, segmented by treatment regimen. This preparation ensures that the resulting plot will effectively display the relationship between initial culture positivity and the first culture conversion across different regimens.
+:::
+
+## f. Plotting
+
+**Dumbell Plot**
+
+```{r, warning=FALSE}
+plot5 <- ggplot(mini_data1, aes(x = Time_Diff, y = studycode)) +
+  geom_point(aes(x = 0), color = "red", size = 0) +
+  geom_point(aes(x = Time_Diff), color = "blue", size = 0) +
+  geom_segment(aes(x = 0, xend = Time_Diff, yend = studycode), color = "grey") +
+  facet_grid(rows = vars(Regimen), scales = "free_y", space = "free_y") +
+  labs(title = "Dumbbell Plot of First Culture Conversion Time",
+       x = "Days from date.N0",
+       y = "Studycode") +
+  theme_minimal() +
+  theme(
+
+    axis.text.x = element_text(size =8),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    strip.text.y = element_text(size = 12, face = "bold", angle = 0),
+    plot.margin = margin(1, 1, 1, 1, "cm")
+  )
+
+plot5
+```
+
+**Violin Plot**
+
+```{r, warning=FALSE}
+plot6 <- ggplot(mini_data1, aes(y = Regimen, x = Time_Diff, fill = Regimen)) +
+  geom_violin(trim = FALSE, alpha = 0.7) +
+  geom_boxplot(width = 0.2, color = "black", outlier.shape = NA) +
+  stat_summary(fun = median, geom = "point", shape = 23, size = 3, fill = "black") +
+  labs(title = "Comparison of First Culture Conversion Time Across Regimens",
+       y = "Treatment Regimen",
+       x = "Days to First Culture Conversion") +
+  theme_minimal() +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 14, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 12, face = "bold"))
+
+plot6
+```
+
+**Histogram**
+
+```{r, warning=FALSE}
+plot7 <- ggplot(mini_data1, aes(x = Time_Diff, fill = Regimen, color = Regimen)) +
+  geom_density(alpha = 0.3, size = 1.2) +
+  facet_grid(rows = vars(Regimen), scales = "free_y") +
+  labs(title = "Smoothed Distribution of First Culture Conversion Time by Regimen",
+       x = "Days to First Culture Conversion",
+       y = "Density") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(size = 14, face = "bold"),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 12, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold")
+  )
+
+plot7
+```
+
+## g. Hypothesis test for comparison among regimens
+
+**Shapiro-Wilk normality test**
+
+```{r}
+normality_test_results <- bind_rows(
+  mini_data1 %>%
+    summarise(
+      Regimen = "Whole Data",
+      Shapiro_Test = list(shapiro.test(Time_Diff)),
+      .groups = "drop"
+    ),
+  mini_data1 %>%
+    group_by(Regimen) %>%
+    summarise(
+      Shapiro_Test = list(shapiro.test(Time_Diff)),
+      .groups = "drop"
+    )
+)
+
+normality_test_results <- normality_test_results %>%
+  mutate(
+    W = sapply(Shapiro_Test, function(x) x$statistic),
+    p_value = sapply(Shapiro_Test, function(x) x$p.value)
+  ) %>%
+  select(Regimen, W, p_value)
+
+print(normality_test_results)
+```
+
+::: {style="text-align: justify;"}
+The results from the Shapiro-Wilk normality test show that the data does not follow a normal distribution for both the overall dataset and each individual treatment regimen (6M, 8M, 9M, 20M). The Shapiro-Wilk test evaluates whether a dataset is normally distributed by comparing the sample distribution to a normal distribution. A p-value lower than 0.05 suggests that the data significantly deviates from a normal distribution.
+
+In this case, for all groups (whole data and each regimen), the p-values are extremely small (much less than 0.05), indicating that the null hypothesis of normality is rejected. This means that the assumption of normality does not hold for the data, which suggests that we cannot apply statistical methods that assume a normal distribution (such as t-tests, ANOVA) for further analysis.
+
+Given this, alternative statistical methods that do not rely on the assumption of normality, like the Kruskal-Wallis test, would be more appropriate for analyzing the data.
+:::
+
+**Kruskal-Wallis test**
+
+```{r}
+kruskal_test <- kruskal.test(Time_Diff ~ Regimen, data = mini_data1)
+print(kruskal_test)
+```
+
+::: {style="text-align: justify;"}
+The Kruskal-Wallis test is comparing the differences in the time to first sputum culture conversion (`Time_Diff`) across the four treatment regimens. The test statistic, which follows a chi-squared distribution, is 18.634, with 3 degrees of freedom. The p-value is very small (0.0003254), indicating strong evidence against the null hypothesis, which suggests that there is a statistically significant difference in the time to first conversion between the regimens. Therefore, we can conclude that the time to first sputum culture conversion differs across the four treatment regimens.
+:::
+
+**Dunn's test**
+
+```{r, warning=FALSE}
+dunn_test <- dunnTest(Time_Diff ~ Regimen, data = mini_data1, method = "bh")
+
+print(dunn_test)
+```
+
+::: {style="text-align: justify;"}
+The results of the Dunn's test provide pairwise comparisons of the time difference to the first sputum culture conversion across different treatment regimens. For the comparison between the 20M and 6M regimens, the Z-value is 2.66, and the p-value (adjusted for multiple comparisons) is 0.0231, indicating a significant difference between these two regimens. In contrast, the comparison between 20M and 8M yielded a Z-value of 0.11, with both unadjusted and adjusted p-values near 1, suggesting no significant difference between these regimens.
+
+For the 6M and 8M comparison, the Z-value is -2.24, with an unadjusted p-value of 0.025 and an adjusted p-value of 0.050, which suggests a marginally significant difference between these two regimens. The comparison between the 20M and 9M regimens resulted in a Z-value of 0.16, and p-values close to 1, indicating no significant difference. A significant difference was observed between the 6M and 9M regimens, with a Z-value of -3.55, an unadjusted p-value of 0.0004, and an adjusted p-value of 0.0024, which is statistically significant. Lastly, the comparison between 8M and 9M showed a Z-value of 0.01, and both p-values were close to 1, meaning there was no significant difference.
+
+Overall, significant differences in the time to first sputum culture conversion were found between the 20M and 6M regimens, and the 6M and 9M regimens. The difference between 6M and 8M is marginally significant, while the other comparisons showed no significant differences.
+:::
+
+# Comparison of Triet's computed first conversion and pre-existing first conversion
+
+```{r}
+#???
+```
