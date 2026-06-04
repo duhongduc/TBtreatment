@@ -893,7 +893,7 @@ km_gg <- function(regimens, title_txt, break_by = 30) {
                        labels = scales::percent_format(accuracy = 1),
                        expand = expansion(mult = c(0.01,0.02))) +
     labs(title = title_txt, x = NULL,
-         y = "Cumulative probability\nof culture conversion") +
+         y = "Cumulative probability of culture conversion") +
     theme_bw(base_size = .FS$base) +
     theme(plot.title       = element_text(face="bold", size=.FS$title),
           legend.position  = "top", legend.direction = "horizontal",
