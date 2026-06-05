@@ -525,7 +525,7 @@ heatmap_plot <- ggplot(
                  "Positive" = "#D32F2F",
                  "No sputum" = "white"),
     na.value = "grey88",
-    name     = "Culture Status"
+    name     = "Culture\nStatus"
   ) +
   scale_x_discrete(guide = guide_axis(angle = 90)) +
   scale_y_reverse(expand = c(0, 0)) +   # rank=1 (earliest) at TOP
@@ -538,18 +538,18 @@ heatmap_plot <- ggplot(
     x = "Follow-up Timepoints",
     y = "Patients (earliest converter → top)"
   ) +
-  theme_bw(base_size = 65) +    # master font: height(72cm) × ~0.75
+  theme_bw(base_size = 55) +    # master font: height(72cm) × ~0.75
   theme(
     # X-axis tick labels
-    axis.text.x      = element_text(size = 55, angle = 90,
+    axis.text.x      = element_text(size = 48, angle = 90,
                                     vjust = 0.5, hjust = 1, color = "black"),
     # Y-axis: suppress patient IDs, keep title
     axis.text.y      = element_blank(),
     axis.ticks.y     = element_blank(),
-    axis.title.x     = element_text(size = 65, face = "bold", margin = margin(t = 8)),
-    axis.title.y     = element_text(size = 65, face = "bold", margin = margin(r = 8)),
+    axis.title.x     = element_text(size = 52, face = "bold", margin = margin(t = 8)),
+    axis.title.y     = element_text(size = 52, face = "bold", margin = margin(r = 8)),
     # Facet strip (Regimen label)
-    strip.text.y     = element_text(size = 60, face = "bold", angle = 0,
+    strip.text.y     = element_text(size = 50, face = "bold", angle = 0,
                                     margin = margin(l = 8, r = 8)),
     strip.background = element_rect(fill = "#C8DCF0", color = "grey50", linewidth = 0.6),
     # Panels
@@ -557,13 +557,13 @@ heatmap_plot <- ggplot(
     panel.border     = element_rect(color = "grey30", fill = NA, linewidth = 0.8),
     panel.spacing.y  = unit(1.2, "lines"),
     # Title & subtitle
-    plot.title       = element_text(size = 80, face = "bold", margin = margin(b = 4)),
-    plot.subtitle    = element_text(size = 60, color = "grey25", margin = margin(b = 8)),
+    plot.title       = element_text(size = 58, face = "bold", margin = margin(b = 4)),
+    plot.subtitle    = element_text(size = 44, color = "grey25", margin = margin(b = 8)),
     # Legend
     legend.position  = "right",
-    legend.title     = element_text(size = 70, face = "bold"),
-    legend.text      = element_text(size = 60),
-    legend.key.size  = unit(1.5, "cm"),
+    legend.title     = element_text(size = 48, face = "bold"),
+    legend.text      = element_text(size = 46),
+    legend.key.size  = unit(1.0, "cm"),
     legend.key       = element_rect(color = "grey60"),
     # Overall plot margins
     plot.margin      = margin(12, 18, 12, 12)
@@ -893,7 +893,7 @@ km_gg <- function(regimens, title_txt, break_by = 30) {
                        labels = scales::percent_format(accuracy = 1),
                        expand = expansion(mult = c(0.01,0.02))) +
     labs(title = title_txt, x = NULL,
-         y = "Cumulative probability of culture conversion") +
+         y = "Cumulative probability\nof culture conversion") +
     theme_bw(base_size = .FS$base) +
     theme(plot.title       = element_text(face="bold", size=.FS$title),
           legend.position  = "top", legend.direction = "horizontal",
@@ -1367,8 +1367,8 @@ summary(pooled_full, conf.int = TRUE, exponentiate = TRUE)
 # Run sequentially — future/multisession is unreliable across platforms.
 # Set n_imp_lasso=5, n_boot=20 for a quick test run; scale to 50×200 for
 # the final analysis (expect ~1-2 hours on a modern laptop).
-n_imp_lasso <- 50    # increase to 50 for final run
-n_boot      <- 200   # increase to 200 for final run
+n_imp_lasso <- 5    # increase to 50 for final run
+n_boot      <- 20   # increase to 200 for final run
 
 set.seed(1234)
 
@@ -1451,8 +1451,14 @@ all_briers <- sapply(all_boot_lasso, `[[`, "brier")
 cat(sprintf("Mean AUC (LASSO):   %.3f\n", mean(all_rocs,   na.rm = TRUE)))
 cat(sprintf("Mean Brier (LASSO): %.3f\n", mean(all_briers, na.rm = TRUE)))
 
-save(results_lasso, selected_vars_lasso,
-     file = "output/LASSO_results.RData")
+# Save only summary results (not full bootstrap objects which are 100s of MB)
+saveRDS(list(var_freq       = var_freq,
+             selected_vars  = selected_vars_lasso,
+             mean_auc       = mean(all_rocs,   na.rm = TRUE),
+             mean_brier     = mean(all_briers, na.rm = TRUE)),
+        file = "output/LASSO_summary.rds")
+cat("LASSO summary saved (small file).\n")
+# Note: full results_lasso object (~200MB) is NOT saved to avoid GitHub limits
 
 
 # ── 15. FINAL LASSO MODEL (display, validate, calibrate) ──────────────────────
@@ -1535,8 +1541,8 @@ plot(cal_lasso, main = "Calibration: LASSO Model"); dev.off()
 
 
 # ── 16. AIC STEPWISE MODEL ────────────────────────────────────────────────────
-n_imp_aic  <- 50    # increase to 50 for final run
-n_boot_aic <- 200   # increase to 200 for final run
+n_imp_aic  <- 5    # increase to 50 for final run
+n_boot_aic <- 20   # increase to 200 for final run
 
 set.seed(1234)
 
@@ -1646,8 +1652,10 @@ png("figures/Calibration_AIC.png",   width = 2000, height = 1600, res = 150)
 plot(cal_aic, main = "Calibration: AIC Model")
 dev.off()
 
-save(selected_vars_aic, results_aic, f_aic, val_aic, cal_aic,
-     file = "output/AIC_results.RData")
+saveRDS(list(var_freq_aic    = var_freq_aic,
+             selected_vars  = selected_vars_aic),
+        file = "output/AIC_summary.rds")
+cat("AIC summary saved (small file).\n")
 
 
 # ── 17. eventglm: DIRECT REGRESSION ON CUMULATIVE INCIDENCE ──────────────────
@@ -1841,8 +1849,8 @@ if (length(taus_tve) >= 2) {
 
 cat("\n=== eventglm Full Prediction Model (MI + Bootstrap) ===\n")
 
-n_imp_eg  <- 50    # increase to 50 for final run
-n_boot_eg <- 200   # increase to 200 for final run
+n_imp_eg  <- 5    # increase to 50 for final run
+n_boot_eg <- 20   # increase to 200 for final run
 set.seed(1234)
 
 # Join sputum_eg_cc (has status_bin) back with sputum to get all pred variables
@@ -2160,6 +2168,472 @@ cat("\n=== DeLong AUC comparison: Enriched vs Full ===\n")
 print(roc.test(roc_e, roc_f, reuse.auc = FALSE))
 
 
+
+# ── 18s. SENSITIVITY ANALYSIS: EXPANDED PREDICTOR SET ────────────────────────
+#
+# RATIONALE (from systematic univariable screening of all 285 non-date/culture
+# variables in the dataset):
+#
+#   Variables with STRONGER univariable association than some current predictors:
+#     PackPerDay  p=0.0007  missing=0%   → replaces bmi (p=0.54) and
+#                                           TBTreatedBefore (p=0.14) as
+#                                           smoking-intensity continuous marker
+#     MONOLE      p=0.0053  missing=12%  → monocyte %, marker of innate immunity
+#                                           activation; not captured by NEU_LYM
+#     Smoking     p=0.0216  missing=0%   → categorical (never/ex/occ/regular)
+#     Drug_WGS_sum p=0.069  missing=22%  → WGS-based drug resistance summary;
+#                                           highest biological plausibility for
+#                                           MDR-TB outcomes, intentionally
+#                                           included despite borderline p
+#
+#   Variables REMOVED from v1 model (weak univariable evidence):
+#     bmi           p=0.54
+#     TBTreatedBefore p=0.14
+#     Diabetes      p=0.64
+#     anemia        p=0.10
+#     clini_score   p=0.09  (borderline; kept as optional — see note below)
+#
+# EPV check:
+#   Bad outcomes = 132;  new predictors = 12  →  EPV = 11  (acceptable)
+#
+# COMPARISON STRATEGY:
+#   1. Fit LASSO and full models on v2 predictor set
+#   2. Compare optimism-corrected C-statistic vs v1 models
+#   3. Plot DCA overlay: v1 Enriched vs v2 Best
+#   4. If v2 C-corr > v1 C-corr + 0.005, report v2 as primary
+#      Otherwise: keep v1 as primary, report v2 as robustness check
+# --------------------------------------------------------------------------
+
+cat("\n\n")
+cat("╔══════════════════════════════════════════════════════════════════╗\n")
+cat("║    18s. SENSITIVITY ANALYSIS — EXPANDED PREDICTOR SET (v2)      ║\n")
+cat("╚══════════════════════════════════════════════════════════════════╝\n\n")
+
+# ── 18s-i. Build v2 prediction dataset ───────────────────────────────────────
+# New predictors: PackPerDay, MONOLE, Smoking, Drug_WGS_sum
+# Retained:       age, ALB, Timika.score, PatientHIV, Regimen,
+#                 NEU_LYM, CT_mean, DUR, clini_score (borderline, kept)
+# Removed:        bmi, TBTreatedBefore, Diabetes, anemia
+
+pred_vars_v2 <- c(
+  # --- Retained from v1 (strong/moderate evidence) ---
+  "age", "DUR", "PatientHIV", "Regimen",
+  "NEU_LYM", "ALB", "Timika.score", "CT_mean",
+  "clini_score",          # borderline p=0.09; retained for clinical face validity
+
+  # --- New (stronger univariable evidence than removed v1 vars) ---
+  "PackPerDay",           # smoking intensity (continuous); p=0.0007
+  "MONOLE",               # monocyte % (innate immunity);  p=0.005
+  "Smoking",              # smoking category;               p=0.022
+  "Drug_WGS_sum",         # WGS resistance summary;         p=0.069
+
+  # --- Outcome ---
+  "outcome_bin"
+)
+
+data_pred_v2 <- dat %>%
+  select(all_of(pred_vars_v2)) %>%
+  filter(!is.na(outcome_bin)) %>%
+  mutate(
+    outcome_bin   = droplevels(outcome_bin),
+    PackPerDay    = as.numeric(PackPerDay),
+    MONOLE        = as.numeric(MONOLE),
+    Smoking       = factor(Smoking,
+                           levels = c("Never","Ex-Smoker","Occasional","Regular")),
+    Drug_WGS_sum  = factor(Drug_WGS_sum)
+  )
+
+cat(sprintf("v2 dataset: n=%d | Bad=%d | Good=%d | predictors=%d\n",
+            nrow(data_pred_v2),
+            sum(data_pred_v2$outcome_bin == "Bad outcome", na.rm=TRUE),
+            sum(data_pred_v2$outcome_bin == "Good outcome", na.rm=TRUE),
+            length(pred_vars_v2) - 1))
+
+# Report missing per new variable
+cat("\nMissing data in new predictors:\n")
+for (v in c("PackPerDay","MONOLE","Smoking","Drug_WGS_sum")) {
+  cat(sprintf("  %-15s: %d missing (%4.1f%%)\n", v,
+              sum(is.na(data_pred_v2[[v]])),
+              100*mean(is.na(data_pred_v2[[v]]))))
+}
+
+# ── 18s-ii. Multiple imputation for v2 ───────────────────────────────────────
+cat("\nRunning MICE imputation for v2 dataset...\n")
+
+# Step 1: dry run to extract default method and predictor matrix
+ini_v2  <- mice(data_pred_v2, m=1, maxit=0, printFlag=FALSE)
+pred_v2 <- ini_v2$predictorMatrix
+meth_v2 <- ini_v2$method
+
+# Step 2: lock outcome — never imputed, never used as predictor row
+pred_v2["outcome_bin", ] <- 0   # outcome does not predict others (row)
+pred_v2[, "outcome_bin"] <- 0   # outcome not used as predictor (column)
+meth_v2["outcome_bin"]   <- ""
+
+# Step 3: also lock variables that should not be imputed
+# (complete or structural variables)
+no_impute <- c("age", "DUR", "PatientHIV", "Regimen",
+               "NEU_LYM", "PackPerDay", "Smoking", "outcome_bin")
+for (v in no_impute) {
+  if (v %in% names(meth_v2)) {
+    if (sum(is.na(data_pred_v2[[v]])) == 0) {
+      meth_v2[v]   <- ""          # no missingness → no method needed
+      pred_v2[v, ] <- 0           # don't use as imputation model either
+    }
+  }
+}
+
+# Step 4: assign correct imputation methods for variables WITH missing data
+# mice default auto-detection is usually correct, but we override explicitly:
+#
+#   continuous  → "pmm"  (predictive mean matching; robust to non-normality)
+#   binary      → "logreg"
+#   unordered k-level factor → "polyreg"  (polytomous logistic)
+#   ordered factor           → "polr"     (proportional odds)
+
+# Continuous variables with missing
+for (v in c("ALB", "Timika.score", "CT_mean", "clini_score", "MONOLE")) {
+  if (v %in% names(meth_v2) && sum(is.na(data_pred_v2[[v]])) > 0)
+    meth_v2[v] <- "pmm"
+}
+
+# Binary factor with missing (anemia removed in v2; PatientHIV complete)
+# none needed — but keep as guard
+for (v in c("PatientHIV")) {
+  if (v %in% names(meth_v2) && sum(is.na(data_pred_v2[[v]])) > 0)
+    meth_v2[v] <- "logreg"
+}
+
+# Unordered multi-level factors
+for (v in c("Drug_WGS_sum", "Smoking", "Regimen")) {
+  if (v %in% names(meth_v2) && sum(is.na(data_pred_v2[[v]])) > 0)
+    meth_v2[v] <- "polyreg"
+}
+
+# Diagnostic: print final method assignment
+cat("Final imputation methods assigned:\n")
+active_meth <- meth_v2[meth_v2 != ""]
+for (v in names(active_meth)) {
+  n_miss <- sum(is.na(data_pred_v2[[v]]))
+  cat(sprintf("  %-18s → %-10s  (missing n=%d, %.1f%%)\n",
+              v, active_meth[v], n_miss, 100*n_miss/nrow(data_pred_v2)))
+}
+
+# Sanity check: no variable with missing data left with method=""
+vars_missing <- names(data_pred_v2)[sapply(data_pred_v2, function(x) any(is.na(x)))]
+vars_missing <- setdiff(vars_missing, "outcome_bin")
+unhandled <- vars_missing[meth_v2[vars_missing] == ""]
+if (length(unhandled) > 0) {
+  warning("Variables with missing data but no imputation method: ",
+          paste(unhandled, collapse=", "))
+} else {
+  cat("OK: all variables with missing data have an imputation method.\n")
+}
+
+# Step 5: run imputation
+set.seed(2024)
+imp_v2 <- mice(data_pred_v2,
+               m               = n_imp,   # same as main analysis (50 for final)
+               maxit           = 10,
+               predictorMatrix = pred_v2,
+               method          = meth_v2,
+               printFlag       = FALSE,
+               seed            = 2024)
+
+# Step 6: check convergence (mean and SD of imputed values per iteration)
+cat("\nImputation convergence check (last 3 iterations, selected vars):\n")
+for (v in names(active_meth)[1:min(4, length(active_meth))]) {
+  tryCatch({
+    mn <- imp_v2$chainMean[v,,]
+    cat(sprintf("  %s: mean range [%.2f, %.2f]\n",
+                v, min(mn, na.rm=TRUE), max(mn, na.rm=TRUE)))
+  }, error=function(e) NULL)
+}
+
+data_imp_v2 <- mice::complete(imp_v2, action="long", include=FALSE) %>%
+  mutate(outcome_bin = factor(outcome_bin,
+                              levels = c("Good outcome","Bad outcome")))
+
+cat(sprintf("\nv2 imputed long dataset: n=%d rows (%d imputations × %d patients)\n",
+            nrow(data_imp_v2), n_imp, nrow(data_pred_v2)))
+
+# ── 18s-iii. LASSO v2 ────────────────────────────────────────────────────────
+cat("\n--- LASSO sensitivity model (v2 predictors) ---\n")
+
+n_imp_sa  <- n_imp
+n_boot_sa <- n_boot
+
+results_lasso_v2 <- vector("list", n_imp_sa)
+var_count_v2     <- list()
+all_rocs_v2      <- c()
+all_briers_v2    <- c()
+
+for (i in seq_len(n_imp_sa)) {
+  data_i <- mice::complete(imp_v2, action=i, include=FALSE) %>%
+    mutate(outcome_bin = factor(outcome_bin,
+                                levels=c("Good outcome","Bad outcome")))
+
+  boot_res <- lapply(seq_len(n_boot_sa), function(j) {
+    idx        <- sample(nrow(data_i), replace=TRUE)
+    data_boot  <- na.omit(data_i[idx, ])
+    if (nrow(data_boot) < 50 ||
+        sum(data_boot$outcome_bin=="Bad outcome") < 5) return(NULL)
+
+    X <- tryCatch(
+      model.matrix(outcome_bin ~ age + DUR + PatientHIV + Regimen +
+                     NEU_LYM + ALB + Timika.score + CT_mean + clini_score +
+                     PackPerDay + MONOLE + Smoking + Drug_WGS_sum - 1,
+                   data = data_boot),
+      error = function(e) NULL)
+    if (is.null(X)) return(NULL)
+
+    y <- as.integer(data_boot$outcome_bin == "Bad outcome")
+    cv_fit <- tryCatch(
+      cv.glmnet(X, y, family="binomial", alpha=1, nfolds=10),
+      error = function(e) NULL)
+    if (is.null(cv_fit)) return(NULL)
+
+    coefs  <- coef(cv_fit, s="lambda.min")
+    nz     <- rownames(coefs)[coefs[,1] != 0 & rownames(coefs) != "(Intercept)"]
+    roc_v  <- tryCatch({
+      probs <- predict(cv_fit, newx=X, s="lambda.min", type="response")[,1]
+      as.numeric(pROC::roc(y, probs, quiet=TRUE)$auc)
+    }, error=function(e) NA_real_)
+    brier_v <- if (!is.na(roc_v)) {
+      probs <- predict(cv_fit, newx=X, s="lambda.min", type="response")[,1]
+      mean((y - probs)^2, na.rm=TRUE)
+    } else NA_real_
+
+    list(vars=nz, auc=roc_v, brier=brier_v)
+  })
+
+  boot_res <- Filter(Negate(is.null), boot_res)
+  for (r in boot_res) {
+    all_rocs_v2   <- c(all_rocs_v2,   r$auc)
+    all_briers_v2 <- c(all_briers_v2, r$brier)
+    for (v in r$vars) var_count_v2[[v]] <- (var_count_v2[[v]] %||% 0) + 1
+  }
+  cat(sprintf("  LASSO v2 MI %d/%d\n", i, n_imp_sa))
+}
+
+total_boots_v2   <- n_imp_sa * n_boot_sa
+var_freq_v2      <- sort(unlist(var_count_v2) / total_boots_v2 * 100, decreasing=TRUE)
+selected_v2      <- names(var_freq_v2)[var_freq_v2 > 50]
+
+cat("\nv2 LASSO — Variable inclusion frequencies (>10%):\n")
+print(round(var_freq_v2[var_freq_v2 > 10], 1))
+cat(sprintf("\nSelected (>50%% frequency): %s\n", paste(selected_v2, collapse=", ")))
+cat(sprintf("LASSO v2 — Mean AUC: %.3f | Brier: %.3f\n",
+            mean(all_rocs_v2, na.rm=TRUE), mean(all_briers_v2, na.rm=TRUE)))
+
+# ── 18s-iv. Full model v2 ────────────────────────────────────────────────────
+cat("\n--- Full model v2 ---\n")
+
+dd_v2 <- datadist(data_imp_v2); options(datadist="dd_v2")
+
+f_full_v2 <- rms::lrm(
+  outcome_bin ~ age + DUR + PatientHIV + Regimen +
+    NEU_LYM + ALB + Timika.score + CT_mean + clini_score +
+    PackPerDay + MONOLE + Smoking + Drug_WGS_sum,
+  data = na.omit(data_imp_v2),
+  x = TRUE, y = TRUE
+)
+cat("\n=== Full model v2 ===\n"); print(f_full_v2)
+
+val_full_v2  <- validate(f_full_v2, B=200)
+c_full_v2    <- 0.5 * (val_full_v2[1,5] + 1)
+cat(sprintf("Full v2 optimism-corrected C: %.3f\n", c_full_v2))
+
+# ── 18s-v. Enriched model v2 ─────────────────────────────────────────────────
+cat("\n--- Enriched model v2 ---\n")
+
+# Pre-compute interaction columns (same pattern as v1)
+data_enrich_v2 <- na.omit(data_imp_v2) %>%
+  enrich_cols() %>%
+  mutate(
+    pack_sc    = as.numeric(scale(PackPerDay)),
+    mono_sc    = as.numeric(scale(MONOLE)),
+    # Smoking: collapse to binary heavy/non-heavy for interaction
+    heavy_smk  = as.integer(Smoking %in% c("Regular","Occasional")),
+    smk_x_8M   = heavy_smk * reg_8M,
+    smk_x_9M   = heavy_smk * reg_9M,
+    smk_x_20M  = heavy_smk * reg_20M
+  )
+
+dd_enrich_v2 <- datadist(data_enrich_v2)
+options(datadist = "dd_enrich_v2")
+
+f_enrich_v2 <- rms::lrm(
+  outcome_bin ~ rcs(age_sc,3) + rcs(NEU_LYM,3) + rcs(DUR,3) +
+    timika_sc + PatientHIV + Regimen + CT_mean + ALB +
+    pack_sc + MONOLE + Drug_WGS_sum +
+    hiv_x_8M + hiv_x_9M + hiv_x_20M +
+    tim_x_8M + tim_x_9M + tim_x_20M +
+    smk_x_8M + smk_x_9M + smk_x_20M,
+  data  = data_enrich_v2,
+  x = TRUE, y = TRUE
+)
+cat("\n=== Enriched model v2 ===\n"); print(f_enrich_v2)
+
+val_enrich_v2 <- validate(f_enrich_v2, B=200)
+c_enrich_v2   <- 0.5 * (val_enrich_v2[1,5] + 1)
+cat(sprintf("Enriched v2 optimism-corrected C: %.3f\n", c_enrich_v2))
+
+# Calibration
+png("figures/Calibration_Full_v2.png", width=2000, height=1600, res=150)
+cal_full_v2 <- rms::calibrate(f_full_v2, B=200)
+plot(cal_full_v2, main="Calibration: Full Model v2 (expanded predictors)")
+dev.off()
+
+png("figures/Calibration_Enrich_v2.png", width=2000, height=1600, res=150)
+cal_enrich_v2 <- rms::calibrate(f_enrich_v2, B=200)
+plot(cal_enrich_v2, main="Calibration: Enriched Model v2 (expanded predictors)")
+dev.off()
+
+# ── 18s-vi. Performance comparison table (v1 vs v2) ──────────────────────────
+cat("\n")
+cat("╔════════════════════════════════════════════════════════════════════╗\n")
+cat("║        SENSITIVITY ANALYSIS — MODEL PERFORMANCE SUMMARY           ║\n")
+cat("╠════════════════════════════════════════════════════════════════════╣\n")
+
+perf_sa <- data.frame(
+  Model = c(
+    "v1: LASSO",    "v1: AIC",
+    "v1: Full",     "v1: Enriched",
+    "v2: Full",     "v2: Enriched"
+  ),
+  Predictor_set = c(rep("Original 13",4), rep("Expanded 12",2)),
+  C_raw = c(
+    f_lasso$stats["C"], f_aic$stats["C"],
+    f_full$stats["C"],  f_enrich$stats["C"],
+    f_full_v2$stats["C"], f_enrich_v2$stats["C"]
+  ),
+  C_corr = c(
+    c_lasso_optcorr, c_aic_optcorr,
+    c_full, c_enrich,
+    c_full_v2, c_enrich_v2
+  ),
+  Brier = c(
+    NA, NA,
+    f_full$stats["Brier"],   f_enrich$stats["Brier"],
+    f_full_v2$stats["Brier"], f_enrich_v2$stats["Brier"]
+  )
+)
+perf_sa$C_raw  <- round(perf_sa$C_raw,  3)
+perf_sa$C_corr <- round(perf_sa$C_corr, 3)
+perf_sa$Brier  <- round(perf_sa$Brier,  3)
+
+cat("\n"); print(perf_sa, row.names=FALSE)
+
+# Decision rule
+delta_c <- c_enrich_v2 - c_enrich
+cat(sprintf("\nDelta C (v2 Enriched - v1 Enriched): %+.3f\n", delta_c))
+cat(if (delta_c > 0.005)
+  "DECISION: v2 Enriched IMPROVES over v1 → report v2 as PRIMARY model\n"
+else
+  "DECISION: improvement marginal → keep v1 as PRIMARY, report v2 as ROBUSTNESS CHECK\n")
+
+# ── 18s-vii. DCA overlay: v1 Enriched vs v2 Enriched ─────────────────────────
+cat("\nGenerating DCA comparison plot...\n")
+
+data_dca_v2 <- na.omit(data_imp_v2) %>%
+  enrich_cols() %>%
+  mutate(
+    pack_sc   = as.numeric(scale(PackPerDay)),
+    mono_sc   = as.numeric(scale(MONOLE)),
+    heavy_smk = as.integer(Smoking %in% c("Regular","Occasional")),
+    smk_x_8M  = heavy_smk * reg_8M,
+    smk_x_9M  = heavy_smk * reg_9M,
+    smk_x_20M = heavy_smk * reg_20M
+  ) %>%
+  mutate(
+    p_v1_enrich = tryCatch(
+      predict(f_enrich, newdata=., type="fitted"),
+      error=function(e) rep(NA_real_, nrow(.))),
+    p_v2_enrich = tryCatch(
+      predict(f_enrich_v2, newdata=., type="fitted"),
+      error=function(e) rep(NA_real_, nrow(.))),
+    outcome_num = as.integer(outcome_bin == "Bad outcome")
+  )
+
+thresholds_sa <- seq(0.05, 0.50, by=0.01)
+
+nb_v1e <- sapply(thresholds_sa, function(t) {
+  tp <- mean(data_dca_v2$p_v1_enrich > t & data_dca_v2$outcome_num==1, na.rm=TRUE)
+  fp <- mean(data_dca_v2$p_v1_enrich > t & data_dca_v2$outcome_num==0, na.rm=TRUE)
+  tp - fp * t/(1-t)
+})
+nb_v2e <- sapply(thresholds_sa, function(t) {
+  tp <- mean(data_dca_v2$p_v2_enrich > t & data_dca_v2$outcome_num==1, na.rm=TRUE)
+  fp <- mean(data_dca_v2$p_v2_enrich > t & data_dca_v2$outcome_num==0, na.rm=TRUE)
+  tp - fp * t/(1-t)
+})
+nb_all_sa <- mean(data_dca_v2$outcome_num, na.rm=TRUE) -
+             thresholds_sa/(1-thresholds_sa) *
+             (1 - mean(data_dca_v2$outcome_num, na.rm=TRUE))
+
+dca_sa_df <- data.frame(
+  threshold = thresholds_sa,
+  "v1 Enriched" = nb_v1e,
+  "v2 Enriched" = nb_v2e,
+  "Treat all"   = nb_all_sa,
+  "Treat none"  = 0,
+  check.names   = FALSE
+) %>%
+  pivot_longer(-threshold, names_to="Model", values_to="NetBenefit")
+
+dca_sa_plot <- ggplot(dca_sa_df,
+  aes(x=threshold, y=NetBenefit, color=Model, linetype=Model)) +
+  geom_line(linewidth=1.0) +
+  scale_color_manual(values=c(
+    "v1 Enriched"="#E65100",
+    "v2 Enriched"="#1565C0",
+    "Treat all"  ="grey50",
+    "Treat none" ="grey20")) +
+  scale_linetype_manual(values=c(
+    "v1 Enriched"="solid",
+    "v2 Enriched"="solid",
+    "Treat all"  ="dashed",
+    "Treat none" ="dotted")) +
+  coord_cartesian(ylim=c(-0.02, max(c(nb_v1e,nb_v2e), na.rm=TRUE)*1.2)) +
+  labs(
+    title    = "Sensitivity Analysis: DCA Comparison",
+    subtitle = "v1 Enriched (original 13 predictors) vs v2 Enriched (expanded 12 predictors)",
+    x = "Probability threshold",
+    y = "Net benefit"
+  ) +
+  theme_bw(base_size=13) +
+  theme(legend.position=c(0.75,0.75),
+        legend.background=element_rect(fill="white",color="grey70"),
+        panel.grid.minor=element_blank())
+
+ggsave("figures/DCA_Sensitivity_v1v2.png", dca_sa_plot,
+       width=30, height=22, dpi=300, units="cm", bg="white")
+cat("Sensitivity DCA saved → figures/DCA_Sensitivity_v1v2.png\n")
+
+# ── 18s-viii. Summary for reporting ──────────────────────────────────────────
+cat("\n=== SENSITIVITY ANALYSIS SUMMARY FOR MANUSCRIPT ===\n")
+cat(sprintf("v1 Enriched (n=13 predictors): C-raw=%.3f, C-corr=%.3f, Brier=%.3f\n",
+            f_enrich$stats["C"], c_enrich, f_enrich$stats["Brier"]))
+cat(sprintf("v2 Enriched (n=12 predictors): C-raw=%.3f, C-corr=%.3f, Brier=%.3f\n",
+            f_enrich_v2$stats["C"], c_enrich_v2, f_enrich_v2$stats["Brier"]))
+cat(sprintf("Delta C (v2 - v1): %+.3f\n", delta_c))
+cat(sprintf("New variables in v2: PackPerDay, MONOLE, Smoking, Drug_WGS_sum\n"))
+cat(sprintf("Removed from v1:     bmi (p=0.54), TBTreatedBefore (p=0.14),\n"))
+cat(sprintf("                     Diabetes (p=0.64), anemia (p=0.10)\n"))
+cat("Calibration plots saved: Calibration_Full_v2.png, Calibration_Enrich_v2.png\n")
+
+saveRDS(list(
+  perf_table    = perf_sa,
+  c_full_v2     = c_full_v2,
+  c_enrich_v2   = c_enrich_v2,
+  var_freq_v2   = var_freq_v2,
+  selected_v2   = selected_v2,
+  delta_c       = delta_c
+), "output/sensitivity_v2_summary.rds")
+cat("Summary saved → output/sensitivity_v2_summary.rds\n")
+
+
 # ── 19. FRAMEWORK COMPARISON & OPTIMAL ANALYTICAL STRATEGY ───────────────────
 #
 # WHY eventglm AUC (0.704) > glm/lrm AUC (0.64):
@@ -2300,4 +2774,3 @@ sessionInfo()
 # =============================================================================
 # END OF SCRIPT
 # =============================================================================
-
